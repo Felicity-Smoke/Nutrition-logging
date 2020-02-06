@@ -1,4 +1,4 @@
-from tkinter import Button,Frame,Label,Tk,Menu,ttk, font, RIDGE as relief_ridge
+from tkinter import Button,Frame,Label,Tk,Menu,ttk, font, FLAT as relief
 import locale
 from clsMonth import Month, number_color
 from clsCalendarDay import CalendarDay
@@ -26,31 +26,38 @@ class Input_Window(Frame):
         self.month = month
         
         self.active=False
+        self.container_days = []
 
-        self.padx = 20
-        self.pady = 10
+        self.padx_frame = 20
+        self.pady_frame = 10
+        self.padx=1
+        self.pady=1
         self.bold_big_font='Helvetica 11 bold'
         self.bold_small_font='Helvetica 8 bold'
         self.bigger_font='Helvetica 10'
 
         self.calendar_month_frame=Frame(parent)
-        self.calendar_month_frame.grid(column=0,row=0, padx=self.padx,pady=self.pady,rowspan=25) #rowspan anpassen
+        self.calendar_month_frame.grid(column=0,row=0, padx=self.padx_frame,pady=self.pady_frame,rowspan=25, sticky='N') #rowspan anpassen
+        parent.grid_rowconfigure(0,minsize=100)
 
         #header
-        self.calendar_headings = []
-        self.button_former_month = Button(self.calendar_month_frame,text='<',command=self.goto_previous_month,relief=relief_ridge)
+        self.button_former_month = Button(self.calendar_month_frame,text='<',command=self.goto_previous_month,relief=relief)
         self.month_heading = Label(self.calendar_month_frame,font=self.bigger_font)
-        self.button_next_month = Button(self.calendar_month_frame,text='>',command=self.goto_next_month,relief=relief_ridge)
-        self.calendar_headings.append([self.button_former_month,self.month_heading, self.button_next_month])
-        self.update_displayed_month()
+        self.button_next_month = Button(self.calendar_month_frame,text='>',command=self.goto_next_month,relief=relief)
 
+        self.button_former_month.grid(column=0,row=0,padx=self.padx,pady=self.pady,sticky='nsew')
+        self.month_heading.grid(column=1,row=0,padx=self.padx,pady=self.pady,columnspan=5,sticky='nsew')
+        self.button_next_month.grid(column=6,row=0,padx=self.padx,pady=self.pady,sticky='nsew')
+       
         #days
-        line=[]
+        weekday_labels=[]
         for weekday in ['Mo','Di','Mi','Do','Fr','Sa','So']:
-            line.append(Label(self.calendar_month_frame, text=weekday, font=self.bold_small_font))
-
-        self.calendar_headings.append(line)
-        self.position_widget_lines(self.calendar_headings,self.calendar_month_frame)
+            weekday_labels.append(Label(self.calendar_month_frame, text=weekday, font=self.bold_small_font))
+        for column,weekday in enumerate(weekday_labels):
+            weekday.grid(column=column,row=1,padx=self.padx,pady=self.pady,sticky='nsew')
+                    
+        self.draw_container_days()
+        self.update_displayed_month()
         
         '''
         Optionen
@@ -62,10 +69,7 @@ class Input_Window(Frame):
         self.feature_list.append(ttk.Checkbutton(parent,text='Kalorienbilanz des Tages darstellen'))
         self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit Eiweißdefizit kennzeichnen'))
 
-        col = 1 #anders lösen!
-        self.position_widget_list(self.feature_list, col)
-
-        parent.grid_rowconfigure(0,minsize=200)
+        self.position_widget_list(self.feature_list, column=1)
 
         # Kontextmenü
         self.menu_food = Menu(self, font="TkMenuFont", tearoff=0)
@@ -74,28 +78,6 @@ class Input_Window(Frame):
 
         self.menu_meal = Menu(self, font='TkMenuFont', tearoff=0)
         self.menu_meal.add_command(label='Zutaten anpassen')
-
-    def quit(self):
-        self.quit()
-        
-    def position_widget_lines(self,widget_list, master=None, row_offset=0):
-        y_offset = 1
-        x_offset = 1
-        columnspan=1
-        header = False
-        for row,widgetline in enumerate(widget_list):
-            if len(widgetline)<7:
-                header = True
-            for column,widget in enumerate(widgetline):
-                if header and column==1:
-                    columnspan=5
-                elif header and column==2:
-                    columnspan=1
-                    column=6
-                    header=False
-                widget.grid(column=column, row=row+row_offset, padx=x_offset, pady=y_offset,sticky='nsew', columnspan=columnspan)
-            if master:
-                master.grid_rowconfigure(row,weight=1)
                 
     def goto_next_month(self):
         self.month = self.month.next()
@@ -107,33 +89,52 @@ class Input_Window(Frame):
 
     def update_displayed_month(self):
         self.month_heading['text']=f"{self.month.name} {self.month.year}"
-        self.draw_days_of_list(self.month.calendardays)
+        self.update_display_days(self.month.calendardays)
     
     def position_widget_list(self,widget_list, column=0):
-        y_offset = 1
-        x_offset = 1
-        columnspan=1
-        header = False
         for row,widget in enumerate(widget_list):
-                widget.grid(column=column, row=row, padx=x_offset, pady=y_offset,sticky='nsew', columnspan=columnspan)        
-        
-    def draw_days_of_list(self,days):
-        self.clear_days()
-        self.calendar_itemlines = []
-        line = []
-        for day in days:
-            line.append(CalendarDay(self.calendar_month_frame, text=day.number,fg=day.color))
-            if len(line) == 7:
-                self.calendar_itemlines.append(line)
-                line=[]
+                widget.grid(column=column, row=row, padx=self.padx, pady=self.pady,sticky='nsew')
 
-        self.position_widget_lines(self.calendar_itemlines,self.calendar_month_frame,row_offset=2)
-        
+    def draw_container_days(self):
+        self.container_days = []
+        for x in range(6):
+            line = []
+            for y in range(7):
+                line.append(CalendarDay(self.calendar_month_frame))
+            self.container_days.append(line)
+            
+        self.position_container_days(self.container_days,self.calendar_month_frame,row_offset=2)
 
-    def clear_days(self):
+    def position_container_days(self,widget_list, master=None, row_offset=0):
+        for row,widgetline in enumerate(widget_list):
+            for column,widget in enumerate(widgetline):
+                widget.grid(column=column, row=row+row_offset, padx=self.padx, pady=self.pady,sticky='nsew')
+            if master:
+                master.grid_rowconfigure(row,weight=1)
+                
+    def update_display_days(self,days):
+        unpositioned_weeks=[]
+        for container_week in self.container_days:
+            unpositioned_week = []
+            for container_day in container_week:
+                if days:
+                    container_day.change_day(days[0].number)
+                    container_day.change_textcolor(days[0].color)
+                    del days[0]
+                    if not container_day.grid_info():
+                        unpositioned_week.append(container_day)                                           
+                else:
+                    container_day.grid_forget()
+            unpositioned_weeks.append(unpositioned_week)
+        self.position_container_days(unpositioned_weeks,self.calendar_month_frame,row_offset=self.calendar_month_frame.grid_size()[1])
+        
+    def clear_days(self, startitem=0):
+        count = 0
         for slave in self.calendar_month_frame.grid_slaves():
             if type(slave) == CalendarDay:
-                slave.destroy()
+                count+=1
+                if count>startitem:
+                    slave.forget()
         
     def popup(self, event):
         self.menu_food.tk_popup(event.x_root, event.y_root)

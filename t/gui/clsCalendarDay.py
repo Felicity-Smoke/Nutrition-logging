@@ -55,9 +55,16 @@ class CalendarDay(Frame):
     def set_inactive(self):
         self.config(bg=self.passive_color)
 
+    def change_day(self, new_day):
+        self.day=new_day
+        self.day_label['text']=self.day
+
+    def change_textcolor(self, new_color):
+        self.day_label['foreground']=new_color
+
     @property
     def number(self):
-        return self.day_label['text']
+        return self.day
 
     @property
     def is_active(self):

@@ -35,15 +35,17 @@ class Month:
     def calendardays(self):
         days=[]
         offset = self._date.weekday()
-        for nr in range (offset,0,-1):
-            days.append(number_color(nr))
+        for nr in range (offset-1,-1,-1):
+            days.append(number_color(self.previous().days-nr))
+            
         self.from_date(self.next())
         for nr in range(1,self.days+1):
             days.append(number_color(nr,'black'))
         nr = 1
         while len(days)%7:
             days.append(number_color(nr))
-            nr+=1            
+            nr+=1
+        
         return days
         
     @property
