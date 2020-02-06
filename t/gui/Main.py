@@ -42,6 +42,7 @@ class MainButton(Button):
     def not_chosen(self):
         self['state'] = NORMAL
 
+    #@classmethod
     def chosen(self):
         self['state'] = ACTIVE
         
@@ -57,13 +58,16 @@ class GUI(Frame):
             button.not_chosen()
             
         if view_name == 'activate_overview':
-            self.B1.chosen()
+            pass
+            #self.B1.chosen()
 
         elif view_name == 'activate_food_iniput':
-            self.B2.chosen()
+            pass
+            #self.B2.chosen()
 
         elif view_name == 'activate_calender':
-            self.B3.chosen()
+            pass
+            #self.B3.chosen()
 
     def enter_symbolnavigation_bar(self, e):
         for button in self.mainbuttons:
@@ -75,9 +79,9 @@ class GUI(Frame):
 
     def create_widgets(self):
         size_image = 6 #var gehört wo anders hin!
-        self.photo_overview = PhotoImage(file="Overview.png").subsample(size_image,size_image)
-        self.photo_food = PhotoImage(file="Essen.png").subsample(size_image,size_image)
-        self.photo_calender = PhotoImage(file="Kalender.png").subsample(size_image,size_image)
+        self.photo_overview = PhotoImage(file="Icons/Overview.png").subsample(size_image,size_image)
+        self.photo_food = PhotoImage(file="Icons/Essen.png").subsample(size_image,size_image)
+        self.photo_calender = PhotoImage(file="Icons/Kalender.png").subsample(size_image,size_image)
 
         self.symbolnavigation_bar=Frame(self)
         self.symbolnavigation_bar.grid(column=0,row=0,rowspan=5 )#5 vlt noch bearbeiten!
