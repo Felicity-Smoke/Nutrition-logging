@@ -1,0 +1,10 @@
+Git mini cheat sheet:
+
+git clone <link_zum_repository>
+
+git add *  
+(git add <dateiname>)
+
+git commit -m "Commit-Message"
+
+git push origin master
