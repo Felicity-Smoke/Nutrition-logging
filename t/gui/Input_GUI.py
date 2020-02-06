@@ -1,7 +1,5 @@
-from tkinter import *
-from tkinter import ttk, font
+from tkinter import ttk, font, Entry, Label, Button, Frame, Tk, Menu, W as sticky_W
 from clsSearch import FoodSearch
-from clsDB import DB # passt hier eig gar nicht rein.. logik aus gui raus bringen!
 import sys
 
 class Input_Window(Frame):
@@ -34,13 +32,13 @@ class Input_Window(Frame):
         self.new_item.grid(column=2, row=0, padx=self.padx, pady=self.pady)
 
         self.last_foods = Button(self, text='Zuletzt verwendete')
-        self.last_foods.grid(column=0, row=1, padx=self.padx, pady=self.pady, sticky=W)
+        self.last_foods.grid(column=0, row=1, padx=self.padx, pady=self.pady, sticky=sticky_W)
 
         self.favourite_foods = Button(self, text='Favouriten')
-        self.favourite_foods.grid(column=1, row=1, padx=self.padx, pady=self.pady, sticky=W)
+        self.favourite_foods.grid(column=1, row=1, padx=self.padx, pady=self.pady, sticky=sticky_W)
 
         self.copy_day=Button(self, text='Duplizieren')
-        self.copy_day.grid(column=2, row=1, padx=self.padx, pady=self.pady, sticky=W)
+        self.copy_day.grid(column=2, row=1, padx=self.padx, pady=self.pady, sticky=sticky_W)
 
         self.menu_food = Menu(self, font="TkMenuFont", tearoff=0)
         self.menu_food.add_command(label="Eigenschaften", command=self.food_properties)
@@ -50,20 +48,20 @@ class Input_Window(Frame):
         self.menu_meal.add_command(label='Zutaten anpassen')
 
         self.found_food_frame=Frame(self)
-        self.found_food_frame.grid(row=3, column=0, rowspan=1,columnspan=2, sticky=W) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
-        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor=W, font=self.bold_font)
-        self.found_food_header.grid(column=0,row=0,columnspan=2,sticky=W, padx=self.padx, pady=self.pady/2)
+        self.found_food_frame.grid(row=3, column=0, rowspan=1,columnspan=2, sticky=sticky_W) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
+        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor=sticky_W, font=self.bold_font)
+        self.found_food_header.grid(column=0,row=0,columnspan=2,sticky=sticky_W, padx=self.padx, pady=self.pady/2)
         
 
         self.added_food=Frame(self)
         self.added_food.grid(row=4,column=0, rowspan=3,columnspan=3) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
-        self.header_food=Label(self.added_food, text='Lebensmittel', width=30, anchor=W)
-        self.header_amount=Label(self.added_food, text='Menge',anchor=W)
-        self.header_unit=Label(self.added_food, text='Einheit',anchor=W)
+        self.header_food=Label(self.added_food, text='Lebensmittel', width=30, anchor=sticky_W)
+        self.header_amount=Label(self.added_food, text='Menge',anchor=sticky_W)
+        self.header_unit=Label(self.added_food, text='Einheit',anchor=sticky_W)
 
         self.header_names=[self.header_food,self.header_amount,self.header_unit]
         for column,header_name in enumerate(self.header_names):
-            header_name.grid(row=0,column=column,padx=2,pady=2,sticky=W)
+            header_name.grid(row=0,column=column,padx=2,pady=2,sticky=sticky_W)
 
         self.found_food_labels =[]
         
@@ -84,7 +82,7 @@ class Input_Window(Frame):
     def search_triggered(self,event):
         search_text = self.search_line.get()
         print('part is still missing: Get food names from search term')
-        food_search = FoodSearch(search_text, DB('SchweizerDB.csv'))
+        food_search = FoodSearch(search_text)
         f1={'name': 'Apfel', 'category': 'Obst'}  #testdata
         f2={'name': 'Paranuss', 'category': 'Nüsse & Samen'}
         self.found_foods=[f1,f2]
@@ -103,8 +101,8 @@ class Input_Window(Frame):
             if self.category:
                 if not self.category == found_food['category']:
                     continue
-            name_label = Label(self.found_food_frame, text=found_food['name'], anchor=W) #todo: mehrzeilig
-            category_label = Label(self.found_food_frame, text=found_food['category'], anchor=W)
+            name_label = Label(self.found_food_frame, text=found_food['name'], anchor=sticky_W) #todo: mehrzeilig
+            category_label = Label(self.found_food_frame, text=found_food['category'], anchor=sticky_W)
             self.found_food_labels.append([name_label,category_label])
         self.update_found_food_view()
 
@@ -112,7 +110,7 @@ class Input_Window(Frame):
         self.del_old_found_foods()
         for row,food in enumerate(self.found_food_labels):
             for col,element in enumerate(food):
-                element.grid(row=row+1, column=col, padx=self.padx,pady=0, sticky=W)                
+                element.grid(row=row+1, column=col, padx=self.padx,pady=0, sticky=sticky_W)                
 
         
 root = Tk()

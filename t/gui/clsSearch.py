@@ -8,7 +8,7 @@ class FormerSearch(object):
         self.search_term = search_term
        
 class FoodSearch(object):
-    def __init__(self, search_term, food_db):
+    def __init__(self, search_term, food_db='SchweizerDB.csv'):
         self.food_db = food_db
         
         #Usereinstellungen - sollten später wo geändert werden können

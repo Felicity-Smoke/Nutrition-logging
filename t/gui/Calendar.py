@@ -1,6 +1,5 @@
 from tkinter import Button,Frame,Label,Tk,Menu,ttk, font, RIDGE as relief_ridge
 import locale
-from clsSearch import FoodSearch
 from clsMonth import Month, number_color
 from clsCalendarDay import CalendarDay
 

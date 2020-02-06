@@ -1,7 +1,6 @@
-from tkinter import *
-from tkinter import ttk, font
+from tkinter import Frame, Button, Label, Radiobutton, StringVar, ttk, font, DISABLED, Toplevel
 from clsOkCancel import OK_Cancel
-from clsNutrient_goals import Nutrient_Goals_GUI
+from clsNutrientGoals import Nutrient_Goals_GUI
 import numpy as np
 
 class Subradiobutton(Radiobutton):
@@ -42,7 +41,7 @@ class GUI(Frame):
                     x_offset+=20
             elif widget['text']=='':
                 y_offset=0
-            widget.grid(column=0, row=i, padx=x_offset, pady=y_offset,sticky=(SW))
+            widget.grid(column=0, row=i, padx=x_offset, pady=y_offset,sticky=('SW'))
             y_offset=3
 
     def input_time_option_changed(self):
