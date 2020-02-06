@@ -60,12 +60,13 @@ class Nutrient(object):
         return self.name + ' '*(25 - len(self.name)) + str(self.amount) + self.unit
 
 class MakroNutrient(Nutrient):
-    def __init__(self, name, column, unit, kcal, amount = 0):
-        Nutrient.__init__(self, name, column, unit, amount = 0)
+    def __init__(self, name, column, unit, kcal, amount = 100):
+        Nutrient.__init__(self, name, column, unit, amount)
         
         self.kcal = kcal
 
-    def get_calories(self):
+    @property
+    def get_kcal(self):
         return self.amount*self.kcal
 
 class Part_Of_MakroNutrient(MakroNutrient):
@@ -177,6 +178,7 @@ class Food(object):
             table = table + str(self.nutrients[key]) + '\n'  
         print(heading + table)
 
+    @property
     def __shortname(self):
         name = self.name
 
@@ -204,8 +206,8 @@ class Food(object):
         
         for key in self.basic_keys[1:]:
             try:
-                if self.nutrients[key].get_calories()/self.nutrients['kcal'].amount>=0.01:
-                    data[key] = self.nutrients[key].get_calories()
+                if self.nutrients[key].get_kcal/self.nutrients['kcal'].amount>=0.01:
+                    data[key] = self.nutrients[key].get_kcal
                     labels[key] = self.nutrients[key].name
 
                     if type(self.nutrients[key]) is Part_Of_MakroNutrient:
@@ -219,7 +221,7 @@ class Food(object):
                         elif data[self.nutrients[key].makro_key]/self.nutrients['kcal'].amount<0.1:
                             labels[self.nutrients[key].makro_key] = ''
 
-                    if self.nutrients[key].get_calories()/self.nutrients['kcal'].amount<0.1:
+                    if self.nutrients[key].get_kcal/self.nutrients['kcal'].amount<0.1:
                         labels[key] = ''
                 else:
                     del colors[key]
@@ -233,10 +235,10 @@ class Food(object):
             #vlt iwann besseres Errorhandling schreiben
             
         plt.pie(list(data.values()), colors=list(colors.values()), labels = labels.values(), labeldistance = label_dist, pctdistance = pct_dist, autopct = "%1.1f%%")
-        plt.title(self.__shortname() + ' (' + str(self.line_number + 1) + ')')
+        plt.title(self.__shortname + ' (' + str(self.line_number + 1) + ')')
 
         if save:
-            plt.savefig('Kreisdiagramm ' + self.__shortname() + '.png')
+            plt.savefig('Kreisdiagramm ' + self.__shortname + '.png')
 
         if show:
             plt.show()
@@ -267,10 +269,10 @@ class Food(object):
         collabel=("Nährstoff", "Menge")
         ax.table(cellText=table,colLabels=collabel, loc='center', colWidths=(0.2,0.2), cellLoc=('left','right'))
 
-        plt.title(self.__shortname() + ' (' + str(self.line_number + 1) + ')')
+        plt.title(self.__shortname + ' (' + str(self.line_number + 1) + ')')
         
         if save:
-            plt.savefig('Nährstofftabelle ' + self.__shortname() + '.png')
+            plt.savefig('Nährstofftabelle ' + self.__shortname + '.png')
 
         if show:
             plt.show()
