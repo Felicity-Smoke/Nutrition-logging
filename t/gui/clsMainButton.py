@@ -1,4 +1,4 @@
-from tkinter import Button, Frame, LEFT as compound_left
+from tkinter import Button, Frame, LEFT as compound_left, GROOVE as relief
 
 class MainButton(Button):
     def __init__(self,master=None, cnf={}, **kw):
@@ -6,7 +6,7 @@ class MainButton(Button):
         self.save_text = self['text']
         self.active_color = 'whitesmoke'
         self.passive_color = 'lightgrey'
-        self.active_width = 60
+        self.passive_width = 60
 
         self.background=self.passive_color
         self.activebackground=self.active_color
@@ -16,8 +16,10 @@ class MainButton(Button):
         self['background'] = self.passive_color
         self['activebackground'] = self.active_color
         self['height'] = 50
-        self['width'] = self.active_width
+        self['width'] = self.passive_width
         self['padx'] = 15 #Todo.. funktioniert nur in 'active'
+        self['font'] = 'Helvetica 10'
+        self['relief']=relief
         
         self.bind("<Enter>", self.on_enter)
         self.bind("<Leave>", self.on_leave)
@@ -36,7 +38,7 @@ class MainButton(Button):
 
     def hide_text(self):
         self['text']=''
-        self['width'] = self.active_width
+        self['width'] = self.passive_width
 
     def not_chosen(self):
         self['state'] = NORMAL
@@ -44,3 +46,4 @@ class MainButton(Button):
     #@classmethod
     def chosen(self):
         self['state'] = ACTIVE
+        print(self.save_text + 'was activated')

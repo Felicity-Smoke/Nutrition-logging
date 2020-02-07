@@ -20,7 +20,7 @@ Momentane Mätzchen:
 - CBs nur Optik, keine Funktion
 '''
         
-class Input_Window(Frame):
+class Calendar (Frame):
     def __init__(self, parent,month):
         super().__init__(parent)
         self.month = month
@@ -61,7 +61,7 @@ class Input_Window(Frame):
         
         '''
         Optionen
-        '''
+        
         self.feature_list = []
         self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit Fleischkonsum kennzeichnen'))
         self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit Milchkonsum kennzeichnen'))
@@ -70,6 +70,7 @@ class Input_Window(Frame):
         self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit Eiweißdefizit kennzeichnen'))
 
         self.position_widget_list(self.feature_list, column=1)
+        '''
 
         # Kontextmenü
         self.menu_food = Menu(self, font="TkMenuFont", tearoff=0)
@@ -144,10 +145,10 @@ class Input_Window(Frame):
         print('Kontextmenü erfolgreich getestet')
 
 
-
+'''
 locale.setlocale(locale.LC_ALL,"")
 root = Tk()
-window = Input_Window(root,Month.from_date())
+window = Calendar(root,Month.from_date())
 window.grid(row=0,column=0)
-root.geometry("600x300")
 root.mainloop()
+'''
