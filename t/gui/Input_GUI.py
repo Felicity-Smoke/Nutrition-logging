@@ -1,6 +1,7 @@
 from tkinter import ttk, font, Entry, Label, Button, Frame, Tk, Menu, W as sticky_W
 from clsSearch import FoodSearch
 import sys
+from Search_code import FoodSearch as Search, Searchterm, FoodBasic
 
 class Input_Window(Frame):
     def __init__(self, parent):
@@ -80,12 +81,8 @@ class Input_Window(Frame):
         #wird nur eine Kategorie angegeben, kein Suchbegriff, sollten die Ergebnisse nach bisheriger Häufigkeit sortiert werden!
         
     def search_triggered(self,event):
-        search_text = self.search_line.get()
-        print('part is still missing: Get food names from search term')
-        food_search = FoodSearch(search_text)
-        f1={'name': 'Apfel', 'category': 'Obst'}  #testdata
-        f2={'name': 'Paranuss', 'category': 'Nüsse & Samen'}
-        self.found_foods=[f1,f2]
+        food_search = Search(Searchterm(self.search_line.get()))
+        self.found_foods=food_search.get_basicfood_objects
         self.create_new_found_food_labels()
 
     def del_old_found_foods(self):
@@ -99,10 +96,10 @@ class Input_Window(Frame):
         self.category=self.category_box.get()
         for found_food in self.found_foods:
             if self.category:
-                if not self.category == found_food['category']:
+                if not self.category == found_food.category:
                     continue
-            name_label = Label(self.found_food_frame, text=found_food['name'], anchor=sticky_W) #todo: mehrzeilig
-            category_label = Label(self.found_food_frame, text=found_food['category'], anchor=sticky_W)
+            name_label = Label(self.found_food_frame, text=found_food.name, anchor=sticky_W) #todo: mehrzeilig
+            category_label = Label(self.found_food_frame, text=found_food.category, anchor=sticky_W)
             self.found_food_labels.append([name_label,category_label])
         self.update_found_food_view()
 

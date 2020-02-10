@@ -1,11 +1,19 @@
-from tkinter import Frame, Button, Label, Radiobutton, StringVar, ttk, font, DISABLED, Toplevel
+from tkinter import Frame, Button, Label, Radiobutton, StringVar, ttk, font, DISABLED, NORMAL, Toplevel
 from clsOkCancel import OK_Cancel
 from clsNutrientGoals import Nutrient_Goals_GUI
 import numpy as np
 
+'''
+aktualle Mätzchen:
+- Subradiobutton noch nicht implementiert
+
+nächste Schritte:
+- Einstellungen in json schreiben und von json lesen
+- Einstellungen tatsächlich wo in der Anwendung anwenden
+'''
 class Subradiobutton(Radiobutton):
-    def __init__(master, var, cnf={}, **kw):
-        Radiobutton.__init__(self,master,cnf,**kw)
+    def __init__(self, master, parent_CB, cnf={}, **kw):
+        ttk.Radiobutton.__init__(self,master,cnf,**kw)
         self.configure(state = var)
 
 class GUI(Frame):
@@ -31,18 +39,24 @@ class GUI(Frame):
         return ret_list
     
     def position_widget_list(self,widget_list):
-        y_offset = 3
-        for i,widget in enumerate(widget_list):
-            x_offset = 25
+        pady = (12,7)
+        first_element=True
+        
+        
+        for i,widget in enumerate(widget_list):            
+            padx = 25
             if not type(widget) is Label:
-                x_offset += 25
-                y_offset=0
+                padx += 25
+                pady=(1,1)
                 if type(widget) is Subradiobutton:
-                    x_offset+=20
-            elif widget['text']=='':
-                y_offset=0
-            widget.grid(column=0, row=i, padx=x_offset, pady=y_offset,sticky=('SW'))
-            y_offset=3
+                    padx+=20
+        
+            if first_element:
+                first_element=False
+                pady=(20,pady[1])
+        
+            widget.grid(column=0, row=i, padx=padx, pady=pady,sticky=('SW'))#,ipady=ipady)
+            pady = (12,7)
 
     def input_time_option_changed(self):
         if self.meal_time_activated.get() == '1':
@@ -64,11 +78,13 @@ class GUI(Frame):
         self.tab_input=Frame(self.tab_parent)
         self.tab_goals=Frame(self.tab_parent)
         self.tab_user=Frame(self.tab_parent)
+        self.tab_data_editing=Frame(self.tab_parent)
 
         self.tab_parent.add(self.tab_view, text="Ansicht")
         self.tab_parent.add(self.tab_input, text="Eingabe")
         self.tab_parent.add(self.tab_goals, text="Ziele")
         self.tab_parent.add(self.tab_user, text="Benutzerdaten")
+        self.tab_parent.add(self.tab_data_editing, text="Datenaufbereitung")
 
         offset=5
         self.tab_parent.grid(column=0, row=0, columnspan=offset+3) #TODO: soll über alles (colspan, rowspan), ugly!
@@ -99,7 +115,6 @@ class GUI(Frame):
         
         # Eingabe Tab
         self.input_options=[]
-        self.input_options.append(Label(self.tab_input, text=''))
         self.comments=StringVar() 
         self.input_options.append(ttk.Checkbutton(self.tab_input, text='Kommentare bei Tagesansicht', variable=self.comments, onvalue=True, offvalue=False))
         self.meal_time_activated=StringVar()
@@ -110,7 +125,6 @@ class GUI(Frame):
         self.RB_time2 = ttk.Radiobutton(self.tab_input, text='Zeitangabe bei der Eingabe', variable=input_time_option, value='time_input')
         self.input_options.append(self.RB_time1)
         self.input_options.append(self.RB_time2)
-        self.input_options.append(Label(self.tab_input, text=''))
         self.input_options.append(Button(self.tab_input, text='Favouritenliste zurücksetzen'))
 
 
@@ -122,7 +136,6 @@ class GUI(Frame):
             
         # Ziele Tab
         self.goals_options=[]
-        self.goals_options.append(Label(self.tab_goals, text=''))
         self.kcal_control_on=StringVar()
         self.goals_options.append(ttk.Checkbutton(self.tab_goals, text='Kalorienkontrolle', variable=self.kcal_control_on, onvalue=True, offvalue=False))
         self.daily_dozen_on=StringVar()
@@ -169,8 +182,20 @@ class GUI(Frame):
         
         self.position_widget_list(self.user_options)
 
-        OK_Cancel(self)
+        # Daten
+        self.data_editing=[]
+        self.data_editing.append(ttk.Checkbutton(self.tab_data_editing, text='Median statt Mittelwert berechnen'))
+        self.data_editing.append(ttk.Checkbutton(self.tab_data_editing, text='Daten in Abhängikeit des Bedarfs darstellen'))#vlt auch in GUI rausverlagern
+        self.data_editing.append(ttk.Checkbutton(self.tab_data_editing, text='Zielwerte eines Nährstoffs automatisch mit der Auswahl darstellen')) #wenn Abhängigkeit aktiviert, das deaktiviert!
+        self.data_editing.append(ttk.Checkbutton(self.tab_data_editing, text='Numerische Werte im Diagramm dazuschreiben'))
+        self.data_editing.append(ttk.Checkbutton(self.tab_data_editing, text='Gitter anzeigen'))
+        self.data_editing.append(ttk.Checkbutton(self.tab_data_editing, text='Datenpunkte im Diagramm verbinden'))
+        
+        #self.data_editing.append(ttk.Checkbutton(self.tab_data_editing, text='Farben selbst einstellbar'))
 
+        self.position_widget_list(self.data_editing)
+        
+        OK_Cancel(self)
   
 app=GUI()
 app.master.title('Einstellungen')
