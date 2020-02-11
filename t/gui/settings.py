@@ -11,10 +11,22 @@ nächste Schritte:
 - Einstellungen in json schreiben und von json lesen
 - Einstellungen tatsächlich wo in der Anwendung anwenden
 '''
+
 class Subradiobutton(Radiobutton):
-    def __init__(self, master, parent_CB, cnf={}, **kw):
-        ttk.Radiobutton.__init__(self,master,cnf,**kw)
-        self.configure(state = var)
+    def __init__(self, master, master_CB_active, cnf={},**kw):
+        ttk.Radiobutton.__init__(self,master,**kw)
+        self.update_state()
+
+        if master_CB_active:
+            self.configure(state=NORMAL)
+        else:
+            self.configure(state=DISABLED)
+            
+    def update_state(self):
+        if x == '1': #parent_CB.get()
+            self.configure(state=NORMAL)
+        else:
+            self.configure(state=DISABLED)
 
 class GUI(Frame):
     def ok(self):
@@ -41,8 +53,7 @@ class GUI(Frame):
     def position_widget_list(self,widget_list):
         pady = (12,7)
         first_element=True
-        
-        
+          
         for i,widget in enumerate(widget_list):            
             padx = 25
             if not type(widget) is Label:
@@ -55,16 +66,20 @@ class GUI(Frame):
                 first_element=False
                 pady=(20,pady[1])
         
-            widget.grid(column=0, row=i, padx=padx, pady=pady,sticky=('SW'))#,ipady=ipady)
+            widget.grid(column=0, row=i, padx=padx, pady=pady,sticky=('SW'))
             pady = (12,7)
 
     def input_time_option_changed(self):
+        self.RB_time1.update()
+        self.RB_time2.update()
+        '''
         if self.meal_time_activated.get() == '1':
                 self.RB_time1.configure(state = NORMAL)
                 self.RB_time2.configure(state = NORMAL)
         else:
             self.RB_time1.configure(state = DISABLED)
             self.RB_time2.configure(state = DISABLED)
+        '''
 
     def detailed_goals(self):
         window = Toplevel(self)
@@ -118,10 +133,11 @@ class GUI(Frame):
         self.comments=StringVar() 
         self.input_options.append(ttk.Checkbutton(self.tab_input, text='Kommentare bei Tagesansicht', variable=self.comments, onvalue=True, offvalue=False))
         self.meal_time_activated=StringVar()
-        self.input_options.append(ttk.Checkbutton(self.tab_input, text='Zeitangaben bei der Essenseingabe', variable=self.meal_time_activated, onvalue=True, offvalue=False, command = self.input_time_option_changed))
+        self.CB_time=ttk.Checkbutton(self.tab_input, text='Zeitangaben bei der Essenseingabe', variable=self.meal_time_activated, onvalue=True, offvalue=False, command = self.input_time_option_changed)
+        self.input_options.append(self.CB_time)
         #if self.meal_time:
         input_time_option=StringVar()
-        self.RB_time1 = ttk.Radiobutton(self.tab_input, text='Aufteilung in Frühstück, Mittagessen, Abendessen und Snacks', variable=input_time_option, value='meals')
+        self.RB_time1 = Subradiobutton(self.tab_input, self.CB_time, text='Aufteilung in Frühstück, Mittagessen, Abendessen und Snacks', variable=input_time_option, value='meals')
         self.RB_time2 = ttk.Radiobutton(self.tab_input, text='Zeitangabe bei der Eingabe', variable=input_time_option, value='time_input')
         self.input_options.append(self.RB_time1)
         self.input_options.append(self.RB_time2)

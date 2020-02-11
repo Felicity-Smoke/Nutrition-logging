@@ -5,8 +5,8 @@ from datetime import date
 class FoodBasic(object):
     def __init__(self, argumentlist):
         self.__key=argumentlist[0]
-        self.__name=argumentlist[1]
-        self.__category=argumentlist[2]
+        self.__name= argumentlist[1].rstrip(', ;')
+        self.__category=argumentlist[2].rstrip(', ;')
         self.__calories=argumentlist[3]
 
     @property
@@ -23,6 +23,9 @@ class FoodBasic(object):
 
     def calories(self):
         return self.__calories
+
+    def __str__(self):
+        return str(self.__key)+ ', '+self.__name+', '+self.__category+', '+str(self.__calories)
     
 class Searchterm(object):
     def __init__(self, searchterm, vague_search=False, category=''):
@@ -139,11 +142,14 @@ class FoodSearch(object):
     @property
     def get_basicfood_objects(self):
         return self.all_results
+
+    def show_results(self):
+        for food in self.all_results:
+            print(food)
             
-# _____MAIN_____
+if __name__ == '__main__':
 
-# SUCHE
-#searchterm_obj = Searchterm('Apfel')
-#tempFood = FoodSearch(searchterm_obj)
-
+    searchterm_obj = Searchterm('Apfel')
+    tempFood = FoodSearch(searchterm_obj)
+    tempFood.show_results()
 
