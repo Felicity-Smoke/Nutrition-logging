@@ -1,4 +1,5 @@
 from tkinter import Button, Frame, LEFT as compound_left, GROOVE as relief
+from Fonts import Fonts
 
 class MainButton(Button):
     def __init__(self,master=None, cnf={}, **kw):
@@ -18,7 +19,7 @@ class MainButton(Button):
         self['height'] = 50
         self['width'] = self.passive_width
         self['padx'] = 15 #Todo.. funktioniert nur in 'active'
-        self['font'] = 'Helvetica 10'
+        self['font'] = Fonts.mainbutton_font
         self['relief']=relief
         
         self.bind("<Enter>", self.on_enter)

@@ -1,7 +1,8 @@
-from tkinter import Button,Frame,Label,Tk,Menu,ttk, font, FLAT as relief
+from tkinter import Button,Frame,Label,Tk,Menu,ttk, FLAT as relief
 import locale
 from clsMonth import Month, number_color
 from clsCalendarDay import CalendarDay
+from Fonts import Fonts
 
 '''
 Kalender (ähnlich wie Windows-Version)
@@ -32,9 +33,6 @@ class Calendar (Frame):
         self.pady_frame = 10
         self.padx=1
         self.pady=1
-        self.bold_big_font='Helvetica 11 bold'
-        self.bold_small_font='Helvetica 8 bold'
-        self.bigger_font='Helvetica 10'
 
         self.calendar_month_frame=Frame(parent)
         self.calendar_month_frame.grid(column=0,row=0, padx=self.padx_frame,pady=self.pady_frame,rowspan=25, sticky='N') #rowspan anpassen
@@ -42,7 +40,7 @@ class Calendar (Frame):
 
         #header
         self.button_former_month = Button(self.calendar_month_frame,text='<',command=self.goto_previous_month,relief=relief)
-        self.month_heading = Label(self.calendar_month_frame,font=self.bigger_font)
+        self.month_heading = Label(self.calendar_month_frame,font=Fonts.hel_10)
         self.button_next_month = Button(self.calendar_month_frame,text='>',command=self.goto_next_month,relief=relief)
 
         self.button_former_month.grid(column=0,row=0,padx=self.padx,pady=self.pady,sticky='nsew')
@@ -52,7 +50,7 @@ class Calendar (Frame):
         #days
         weekday_labels=[]
         for weekday in ['Mo','Di','Mi','Do','Fr','Sa','So']:
-            weekday_labels.append(Label(self.calendar_month_frame, text=weekday, font=self.bold_small_font))
+            weekday_labels.append(Label(self.calendar_month_frame, text=weekday, font=Fonts.hel_8_b))
         for column,weekday in enumerate(weekday_labels):
             weekday.grid(column=column,row=1,padx=self.padx,pady=self.pady,sticky='nsew')
                     
@@ -145,10 +143,10 @@ class Calendar (Frame):
         print('Kontextmenü erfolgreich getestet')
 
 
-'''
-locale.setlocale(locale.LC_ALL,"")
-root = Tk()
-window = Calendar(root,Month.from_date())
-window.grid(row=0,column=0)
-root.mainloop()
-'''
+if __name__ == '__main__':
+    locale.setlocale(locale.LC_ALL,"")
+    root = Tk()
+    window = Calendar(root,Month.from_date())
+    window.grid(row=0,column=0)
+    root.mainloop()
+

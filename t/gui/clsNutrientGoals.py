@@ -1,7 +1,8 @@
 from tkinter import *
-from tkinter import ttk, font
+from tkinter import ttk
 from clsOkCancel import OK_Cancel
 import json #später in Externem File
+from Fonts import Fonts
 
 class Nutrients_Goals_Handling(): #später in externem file
     def __init__(self):
@@ -27,13 +28,13 @@ class NutrientLine(Frame):
         self.cb.grid(row = self.rownumber, column = 0)
         
         self.parameters = []
-        self.parameters.append(Label(master, text=name, font='TkDefaultFont'))
+        self.parameters.append(Label(master, text=name, font=Fonts.tk_default))
         self.amount = StringVar()
         self.unit = StringVar()
         self.parameters.append(ttk.Combobox(master, textvariable=self.amount, values=[0,1,2,3,4])) #menge - ausfüllen mit default oder vorherigen Wert!
         self.parameters.append(ttk.Combobox(master, textvariable=self.unit, values=['g','% der kCal', 'g/kg Körpergewicht'])) #Einheit - Möglichkeiten: je kg Körpergewicht; g; % von kcal;
         #iwie automatisch auch berechnen lassen - zb. beim Protein mit Training sehr sinnvoll!
-        self.parameters.append(Label(master, text = str(recommanded[0])+recommanded[1], font='TkDefaultFont'))
+        self.parameters.append(Label(master, text = str(recommanded[0])+recommanded[1], font=Fonts.tk_default))
 
         for i,element in enumerate(self.parameters):
             element.grid(row = self.rownumber, column = i+1, padx=10, pady=3, sticky = (W))
@@ -68,7 +69,7 @@ class Nutrient_Goals_GUI(Frame):
         column_names=['Ein/Aus', 'Nährstoff', 'Menge', 'Einheit', 'Empfohlene Menge']
 
         for i,name in enumerate(column_names):
-            temp_label = Label(self, text=name, font='TkHeadingFont')
+            temp_label = Label(self, text=name, font=Fonts.tk_heading)
             temp_label.grid(column=i, row=0, sticky=(SW), padx=10, pady=10)
 
         # Nutrient lines        

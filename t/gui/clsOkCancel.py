@@ -1,5 +1,5 @@
 from tkinter import*
-from tkinter import ttk,font
+from tkinter import ttk
 
 class OK_Cancel(Frame): #Todo: Rename!
     def __init__(self, master):

@@ -1,4 +1,4 @@
-from tkinter import Frame, Button, Label, Radiobutton, StringVar, ttk, font, DISABLED, NORMAL, Toplevel
+from tkinter import Frame, Button, Label, Radiobutton, StringVar, ttk, DISABLED, NORMAL, Toplevel
 from clsOkCancel import OK_Cancel
 from clsNutrientGoals import Nutrient_Goals_GUI
 import numpy as np
