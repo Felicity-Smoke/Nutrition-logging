@@ -2,6 +2,13 @@ import sqlite3
 import re
 from datetime import date
 
+'''
+- Durcheinander
+
++ in diesem Durcheinander wird erfolgreich von einem Suchbegriff
+  alle zutreffenden Datensätze aus einer sqlite3-Datenbank gelesen
+  
+'''
 class FoodBasic(object):
     def __init__(self, argumentlist):
         self.__key=argumentlist[0]
