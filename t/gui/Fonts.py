@@ -11,6 +11,10 @@ class Fonts (object):
 
     tk_default = 'TkDefaultFont'
     tk_heading='TkHeadingFont'
+
+    framedistance=15
+    table_bg='white'
+    action_bg='navajowhite'
     
     def __init__(self):
         pass

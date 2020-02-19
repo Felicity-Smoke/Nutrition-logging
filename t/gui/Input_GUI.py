@@ -27,13 +27,11 @@ class FoodEntry(ShortFoodEntry):
         db_connection=sqlite3.connect('Food.db')
         cursor=db_connection.cursor()
 
-        print('db open')
         cursor.execute('SELECT Name, Kategorie, kCal FROM Food WHERE id=?', (self._key,))
         result=cursor.fetchone()
         db_connection.close()
         
         if result:
-            print(result)
             self._name=result[0]
             self._category=result[1]
             self._kCal_per_100=result[2]
@@ -69,12 +67,16 @@ class Dayview(Frame):
         locale.setlocale(locale.LC_ALL,"")
 
         self.grid()
-        
-        self.heading = Label(self, text=self.date.strftime('%A %d. %B %Y'),font=Fonts.hel_11_b)
-        self.heading.grid(row=0,column=0,columnspan=5) #columnspan
 
-        self.table_entries=Frame(self,background='white')
-        self.table_entries.grid(row=1,column=0, columnspan=5)
+        self.dayframe = Frame(self,background=Fonts.action_bg)
+        self.dayframe.grid(column=0,row=0, padx=Fonts.framedistance, pady=Fonts.framedistance)
+        dayframe_thickness=3
+        
+        self.heading = Label(self.dayframe, text=self.date.strftime('%A %d. %B %Y'),font=Fonts.hel_11_b)
+        self.heading.grid(row=0,column=0,columnspan=5,padx=dayframe_thickness,pady=(dayframe_thickness,0),sticky='nsew') #columnspan
+
+        self.table_entries=Frame(self.dayframe,background=Fonts.table_bg)
+        self.table_entries.grid(row=1,column=0, columnspan=5,padx=dayframe_thickness,pady=(0,dayframe_thickness))
 
         header=['Name', 'Menge', 'kCal']
         for col,columnheader in enumerate(header):
@@ -88,7 +90,7 @@ class Dayview(Frame):
 
         for row, entry in enumerate(self.todays_entries):
             temp_row=[]
-            temp_row.append(Label(self.table_entries, text=entry.name))
+            temp_row.append(Label(self.table_entries, text=entry.name, anchor='w'))
             temp_row.append(Label(self.table_entries, text=entry.amount))
             temp_row.append(Label(self.table_entries, text=entry.kCal))
             for col, widget in enumerate(temp_row):
@@ -133,47 +135,39 @@ class Input_Window(Frame):
         
         self.active=False
         self.grid(row=0,column=0)
-
-        self.padx = 20
-        self.pady = 10
-        self.category='' 
-
-        self.search_line = Entry(self)
-        self.search_line.bind('<Return>', self.search_triggered)
-        self.category_box = ttk.Combobox(self, values=['Früchte','Süssigkeiten','Getreideprodukte, Hülsenfrüchte und Kartoffeln', 'Gemüse', 'Brote, Flocken und Frühstückscerealien','Nüsse, Samen und Ölfrüchte','Gerichte', 'Fette und Öle','Fisch','Speziallebensmittel','Salzige Snacks','Eier','Milch und Milchprodukte','Fleisch- und Wurstwaren','Fleisch und Innereien','Alkoholhaltige Getränke',''])
-        self.category_box.bind("<<ComboboxSelected>>", self.category_changed)
-        #vlt doch noch auf Listbox umändern, dann könnte man mehrere Kategorien auswählen
-        
-        self.new_item = Button(self, text='Neu')
-        self.last_foods = Button(self, text='Zuletzt verwendete')
-        self.favourite_foods = Button(self, text='Favouriten')
-        self.copy_day=Button(self, text='Duplizieren')
-
-        self.found_food_frame=Frame(self)
-        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor='w', font=Fonts.hel_11_b)
-
-        '''
-        self.added_food=Frame(self)
-        self.added_food.grid(row=4,column=0, rowspan=3,columnspan=3) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
-        self.header_food=Label(self.added_food, text='Lebensmittel', width=30, anchor='w')
-        self.header_amount=Label(self.added_food, text='Menge',anchor=sticky_W)
-        self.header_unit=Label(self.added_food, text='Einheit',anchor=sticky_W)
-
-        self.header_names=[self.header_food,self.header_amount,self.header_unit]
-        for column,header_name in enumerate(self.header_names):
-            header_name.grid(row=0,column=column,padx=2,pady=2,sticky='w')
-        '''
         
         self.found_food_labels =[]
+        self.category=''
 
-        self.search_line.grid(row=0,column=0, padx=self.padx, pady=self.pady)
-        self.category_box.grid(column=1,row=0, padx=self.padx, pady=self.pady)
-        self.new_item.grid(column=2, row=0, padx=self.padx, pady=self.pady)
-        self.last_foods.grid(column=0, row=1, padx=self.padx, pady=self.pady, sticky='w')
-        self.favourite_foods.grid(column=1, row=1, padx=self.padx, pady=self.pady, sticky='w')
-        self.copy_day.grid(column=2, row=1, padx=self.padx, pady=self.pady, sticky='w')
-        self.found_food_frame.grid(row=3, column=0, rowspan=1,columnspan=2, sticky='w') #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
-        self.found_food_header.grid(column=0,row=0,columnspan=2,sticky='w', padx=self.padx, pady=self.pady/2)
+        # searchline
+        self.searchline = Frame(self)      
+        self.search_entry = Entry(self.searchline)
+        self.search_entry.bind('<Return>', self.search_triggered)
+        self.category_box = ttk.Combobox(self.searchline, values=['Früchte','Süssigkeiten','Getreideprodukte, Hülsenfrüchte und Kartoffeln', 'Gemüse', 'Brote, Flocken und Frühstückscerealien','Nüsse, Samen und Ölfrüchte','Gerichte', 'Fette und Öle','Fisch','Speziallebensmittel','Salzige Snacks','Eier','Milch und Milchprodukte','Fleisch- und Wurstwaren','Fleisch und Innereien','Alkoholhaltige Getränke',''])
+        self.category_box.bind("<<ComboboxSelected>>", self.category_changed)
+        #vlt doch noch auf Listbox umändern, dann könnte man mehrere Kategorien auswählen
+        self.search_btn = Button(self.searchline, text='Suchen')#, command=self.search_triggered()) todo
+        
+        self.searchline.grid(row=0,column=0, padx=Fonts.framedistance, pady=Fonts.framedistance, sticky='w')
+        self.search_entry.grid(row=0,column=0, padx=Fonts.framedistance, pady=0)
+        self.category_box.grid(row=0,column=1, padx=Fonts.framedistance, pady=0)
+        self.search_btn.grid(row=0, column=2, padx=Fonts.framedistance, pady=0)
+
+        # input_navigation
+        self.input_navigation = Frame(self)
+        self.last_foods = Button(self.input_navigation, text='Zuletzt verwendete')
+        self.favourite_foods = Button(self.input_navigation, text='Favouriten')
+
+        self.input_navigation.grid(row=1,column=0, padx=Fonts.framedistance, pady=Fonts.framedistance,sticky='w')
+        self.last_foods.grid(column=0, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
+        self.favourite_foods.grid(column=1, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
+
+        # found_food
+        self.found_food_frame=Frame(self, background=Fonts.table_bg)
+        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor='w', font=Fonts.hel_11_b, width=50)
+    
+        self.found_food_frame.grid(row=3, column=0, sticky='w', padx=Fonts.framedistance,pady=Fonts.framedistance) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
+        self.found_food_header.grid(column=0,row=0,columnspan=2,sticky='wesn', padx=1, pady=1)
 
         self.day_frame = Dayview(self,Date.today())
         self.day_frame.grid(column=3, row=0, rowspan=3)
@@ -183,7 +177,7 @@ class Input_Window(Frame):
         self.create_new_found_food_labels()
         
     def search_triggered(self,event):
-        food_search = Search(Searchterm(self.search_line.get()))
+        food_search = Search(Searchterm(self.search_entry.get()))
         self.found_foods=food_search.get_basicfood_objects
         self.create_new_found_food_labels()
 
@@ -209,7 +203,7 @@ class Input_Window(Frame):
         self.del_old_found_foods()
         for row,food in enumerate(self.found_food_labels):
             for col,element in enumerate(food):
-                element.grid(row=row+1, column=col, padx=self.padx,pady=0, sticky='w')                
+                element.grid(row=row+1, column=col, padx=1,pady=1, sticky='wsen')                
 
 if __name__ == '__main__':        
     root = Tk()
