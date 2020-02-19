@@ -95,7 +95,11 @@ class Dayview(Frame):
             temp_row.append(Label(self.table_entries, text=entry.kCal))
             for col, widget in enumerate(temp_row):
                 widget.grid(column=col, row=row+1,padx=1,pady=1,sticky='nswe')
+                widget.bind('<ButtonRelease-1>',self.food_dropped)
 
+    def food_dropped(self,event):
+        self['cursor']='heart'
+        
     def read_todays_entrys_from_db(self, date): #gehört hier unbedingt raus! DB-Zugriffe nicht im GUI-File! (self deswegen bewusst entkoppelt)
         entries_from_date=[]
         db_connection=sqlite3.connect('Food.db')
@@ -155,12 +159,16 @@ class Input_Window(Frame):
 
         # input_navigation
         self.input_navigation = Frame(self)
-        self.last_foods = Button(self.input_navigation, text='Zuletzt verwendete')
+        self.last_foods = Button(self.input_navigation, text='Oft verwendete')
         self.favourite_foods = Button(self.input_navigation, text='Favouriten')
+        self.yesterday = Button(self.input_navigation, text='Gestern')
+        self.choose_day = Button(self.input_navigation, text='Tag wählen')
 
         self.input_navigation.grid(row=1,column=0, padx=Fonts.framedistance, pady=Fonts.framedistance,sticky='w')
         self.last_foods.grid(column=0, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
         self.favourite_foods.grid(column=1, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
+        self.yesterday.grid(column=2, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
+        self.choose_day.grid(column=3, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
 
         # found_food
         self.found_food_frame=Frame(self, background=Fonts.table_bg)
@@ -203,8 +211,16 @@ class Input_Window(Frame):
         self.del_old_found_foods()
         for row,food in enumerate(self.found_food_labels):
             for col,element in enumerate(food):
-                element.grid(row=row+1, column=col, padx=1,pady=1, sticky='wsen')                
+                element.grid(row=row+1, column=col, padx=1,pady=1, sticky='wsen')
+                element.bind('<B1-Motion>',self.motion_active)
+                element.bind('<ButtonRelease-1>',self.motion_stopped)
 
+    def motion_active(self,event):
+        self['cursor']='fleur'
+
+    def motion_stopped(self,event):
+        self['cursor']='left_ptr'
+        
 if __name__ == '__main__':        
     root = Tk()
     app = Input_Window(root)

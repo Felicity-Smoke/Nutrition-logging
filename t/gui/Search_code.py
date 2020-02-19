@@ -28,6 +28,7 @@ class FoodBasic(object):
     def category(self):
         return self.__category
 
+    @property
     def calories(self):
         return self.__calories
 
