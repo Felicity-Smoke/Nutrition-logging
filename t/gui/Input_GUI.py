@@ -3,19 +3,12 @@ from clsSearch import FoodSearch
 import sys
 from Search_code import FoodSearch as Search, Searchterm, FoodBasic
 from Fonts import Fonts
+from clsDBHandling import DBHandling
+from clsShortFoodEntry import ShortFoodEntry
 
-class ShortFoodEntry(object):
-    def __init__(self, key, amount):
-        self._key = key
-        self._amount = amount
-
-    @property
-    def key(self):
-        return self._key
-    @property
-    def amount(self):
-        return self._amount
-
+'''
+Müllklasse! wegbringen
+'''
 class FoodEntry(ShortFoodEntry):
     def __init__(self, key, amount):
         self._key=key
@@ -23,7 +16,7 @@ class FoodEntry(ShortFoodEntry):
         self._name=''
         self._category=''
         self._kCal_per_100=0
-
+        
         db_connection=sqlite3.connect('Food.db')
         cursor=db_connection.cursor()
 
@@ -64,19 +57,19 @@ class Dayview(Frame):
     def __init__(self, parent, date):
         super().__init__(parent)
         self.date=date
+        self.db_handling = DBHandling
         locale.setlocale(locale.LC_ALL,"")
 
         self.grid()
 
         self.dayframe = Frame(self,background=Fonts.action_bg)
         self.dayframe.grid(column=0,row=0, padx=Fonts.framedistance, pady=Fonts.framedistance)
-        dayframe_thickness=3
         
         self.heading = Label(self.dayframe, text=self.date.strftime('%A %d. %B %Y'),font=Fonts.hel_11_b)
-        self.heading.grid(row=0,column=0,columnspan=5,padx=dayframe_thickness,pady=(dayframe_thickness,0),sticky='nsew') #columnspan
+        self.heading.grid(row=0,column=0,columnspan=5,padx=Fonts.table_cell_distance,pady=(Fonts.table_cell_distance,0),sticky='nsew') #columnspan
 
         self.table_entries=Frame(self.dayframe,background=Fonts.table_bg)
-        self.table_entries.grid(row=1,column=0, columnspan=5,padx=dayframe_thickness,pady=(0,dayframe_thickness))
+        self.table_entries.grid(row=1,column=0, columnspan=5,padx=Fonts.table_cell_distance,pady=(0,Fonts.table_cell_distance))
 
         header=['Name', 'Menge', 'kCal']
         for col,columnheader in enumerate(header):
@@ -84,7 +77,7 @@ class Dayview(Frame):
             temp_label.grid(column=col, row=0, padx=1,pady=1,sticky='nswe')
 
         self.todays_entries=[]
-        todys_ShortFoodEntrys=self.read_todays_entrys_from_db(self.date)
+        todys_ShortFoodEntrys=self.db_handling.read_entrys_from_day(self.db_handling,self.date)
         for shortFoodEntry in todys_ShortFoodEntrys:
             self.todays_entries.append(FoodEntry(shortFoodEntry.key,shortFoodEntry.amount))
 
@@ -99,37 +92,16 @@ class Dayview(Frame):
 
     def food_dropped(self,event):
         self['cursor']='heart'
-        
-    def read_todays_entrys_from_db(self, date): #gehört hier unbedingt raus! DB-Zugriffe nicht im GUI-File! (self deswegen bewusst entkoppelt)
-        entries_from_date=[]
-        db_connection=sqlite3.connect('Food.db')
-        cursor=db_connection.cursor()
-
-        #db_timestring: YYYY,MM,DD
-        month = str(date.month)
-        if len(month)==1:
-            month='0'+month
-        day=str(date.day)
-        if len(day)==1:
-            day='0'+day
-        db_timestring = str(date.year) + ',' + month + ',' + day
-        
-        cursor.execute('SELECT Food_ID, Menge FROM FoodEntries WHERE Datum=?',(db_timestring,))
-        result = cursor.fetchone()
-        
-        while result:
-            entries_from_date.append(ShortFoodEntry(result[0],result[1]))
-            result = cursor.fetchone()
-            
-        db_connection.close()
-        return entries_from_date
 
 '''
 Stand Input_Window:
-- sieht richtig mies aus
-- ist nicht gut organisiert
+- sieht eher mies aus
+- schlechtes Naming - eigentlich wird hier nur ausgewählt, nicht eingegeben (Drag, aber kein Drop)
 
 + Suche funktioniert bereits gut, aktiviert durch Enter in der Suchleiste, in der Food.db gefundene Datensätze werden angezeigt
+
+Next steps:
+* Drag n Drop von Suchfenser zu Tagesfenser (inkl. Mauszeiger)
 '''
         
 class Input_Window(Frame):

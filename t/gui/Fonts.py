@@ -13,6 +13,7 @@ class Fonts (object):
     tk_heading='TkHeadingFont'
 
     framedistance=15
+    table_cell_distance = 3
     table_bg='white'
     action_bg='navajowhite'
     
