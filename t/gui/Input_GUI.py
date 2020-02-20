@@ -5,54 +5,10 @@ from Search_code import FoodSearch as Search, Searchterm, FoodBasic
 from Fonts import Fonts
 from clsDBHandling import DBHandling
 from clsShortFoodEntry import ShortFoodEntry
-
-'''
-Müllklasse! wegbringen
-'''
-class FoodEntry(ShortFoodEntry):
-    def __init__(self, key, amount):
-        self._key=key
-        self._amount=amount
-        self._name=''
-        self._category=''
-        self._kCal_per_100=0
-        
-        db_connection=sqlite3.connect('Food.db')
-        cursor=db_connection.cursor()
-
-        cursor.execute('SELECT Name, Kategorie, kCal FROM Food WHERE id=?', (self._key,))
-        result=cursor.fetchone()
-        db_connection.close()
-        
-        if result:
-            self._name=result[0]
-            self._category=result[1]
-            self._kCal_per_100=result[2]
-        else:
-            print('ID ' + str(entry.key) + ' not found!')
-
-    @property
-    def name(self):
-        return self._name
-    @property
-    def category(self):
-        return self._category
-    @property
-    def kCal(self):
-        return self._kCal_per_100*self.amount/100
-    @property
-    def kCal_per_100(self):
-        return self._kCal_per_100
-    @property  #Vererbung?! How To do it?
-    def key(self):
-        return self._key
-    @property
-    def amount(self):
-        return self._amount
     
-import sqlite3
 import locale
 from datetime import date as Date
+
 class Dayview(Frame):
     def __init__(self, parent, date):
         super().__init__(parent)
@@ -77,11 +33,10 @@ class Dayview(Frame):
             temp_label.grid(column=col, row=0, padx=1,pady=1,sticky='nswe')
 
         self.todays_entries=[]
-        todys_ShortFoodEntrys=self.db_handling.read_entrys_from_day(self.db_handling,self.date)
-        for shortFoodEntry in todys_ShortFoodEntrys:
-            self.todays_entries.append(FoodEntry(shortFoodEntry.key,shortFoodEntry.amount))
+        self.todays_ShortFoodEntrys=self.db_handling.read_entrys_from_day(self.db_handling,self.date)
+        self.db_handling.get_several_food_information(self.db_handling,self.todays_ShortFoodEntrys)
 
-        for row, entry in enumerate(self.todays_entries):
+        for row, entry in enumerate(self.todays_ShortFoodEntrys):
             temp_row=[]
             temp_row.append(Label(self.table_entries, text=entry.name, anchor='w'))
             temp_row.append(Label(self.table_entries, text=entry.amount))

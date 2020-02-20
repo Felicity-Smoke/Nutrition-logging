@@ -10,12 +10,12 @@ class DBHandling:
     def __init__(self):
         pass
     
-    def read_entrys_from_day(self, date): #gehört hier unbedingt raus! DB-Zugriffe nicht im GUI-File! (self deswegen bewusst entkoppelt)
+    def read_entrys_from_day(self, date): 
         entries_from_date=[]
         db_connection=sqlite3.connect('Food.db')
         cursor=db_connection.cursor()
 
-        #db_timestring: YYYY,MM,DD
+        #db_timestring: YYYY,MM,DD -> Wieso?? Todo: umändern!
         month = str(date.month)
         if len(month)==1:
             month='0'+month
@@ -34,5 +34,24 @@ class DBHandling:
         db_connection.close()
         return entries_from_date
 
-    #def add_data_from_db(self, short_food_entry):
+    def get_several_food_information(self, list_of_food):
+        for food in list_of_food:
+            self.get_food_information(self,food)
+
+    def get_food_information(self, short_food_entry):
+
+        db_connection=sqlite3.connect('Food.db')
+        cursor=db_connection.cursor()
+
+        cursor.execute('SELECT Name, Kategorie, kCal FROM Food WHERE id=?', (short_food_entry.key,))
+        result=cursor.fetchone()
+        db_connection.close()
+
+        if result:
+            short_food_entry.name=result[0]
+            short_food_entry.category=result[1]
+            short_food_entry.kCal_per_100=result[2]
+        else:
+            print('ID' + str(entry.key) + ' not found in database!')
+        
         
