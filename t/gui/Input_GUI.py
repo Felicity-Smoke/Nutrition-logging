@@ -3,17 +3,14 @@ from clsSearch import FoodSearch
 import sys
 from Search_code import FoodSearch as Search, Searchterm, FoodBasic
 from Fonts import Fonts
-from clsDBHandling import DBHandling
-from clsShortFoodEntry import ShortFoodEntry
-    
+from clsDay import Day
 import locale
 from datetime import date as Date
-
+        
 class Dayview(Frame):
     def __init__(self, parent, date):
         super().__init__(parent)
         self.date=date
-        self.db_handling = DBHandling
         locale.setlocale(locale.LC_ALL,"")
 
         self.grid()
@@ -32,11 +29,9 @@ class Dayview(Frame):
             temp_label = Label(self.table_entries, text=columnheader, font=Fonts.hel_8_b) #später eigene Klasse, um Filtern zu ermöglichen
             temp_label.grid(column=col, row=0, padx=1,pady=1,sticky='nswe')
 
-        self.todays_entries=[]
-        self.todays_ShortFoodEntrys=self.db_handling.read_entrys_from_day(self.db_handling,self.date)
-        self.db_handling.get_several_food_information(self.db_handling,self.todays_ShortFoodEntrys)
+        today = Day(self.date)
 
-        for row, entry in enumerate(self.todays_ShortFoodEntrys):
+        for row, entry in enumerate(today.food_entries):
             temp_row=[]
             temp_row.append(Label(self.table_entries, text=entry.name, anchor='w'))
             temp_row.append(Label(self.table_entries, text=entry.amount))
