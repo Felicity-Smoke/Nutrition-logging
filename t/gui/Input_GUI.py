@@ -27,10 +27,10 @@ class Dayview(Frame):
         self.dayframe.grid(column=0,row=0, padx=Fonts.framedistance, pady=Fonts.framedistance)
 
         # headline
-        self.headline=Frame(self.dayframe,)
-        self.heading = Label(self.headline, text='',font=Fonts.hel_11_b)
-        self.btn_previous=Button(self.headline, text='<',command=self.previous_day,relief='flat')
-        self.btn_next=Button(self.headline,text='>',command=self.next_day,relief='flat')
+        self.headline=Frame(self.dayframe,background='gainsboro') #todo edit color and add to Fonts
+        self.heading = Label(self.headline, text='',font=Fonts.hel_11_b,bg=self.headline['background'])
+        self.btn_previous=Button(self.headline, text='<',command=self.previous_day,relief='flat',bg=self.headline['background'])
+        self.btn_next=Button(self.headline,text='>',command=self.next_day,relief='flat',bg=self.headline['background'])
 
         self.headline.grid(row=0,column=0,padx=Fonts.table_cell_distance,pady=(Fonts.table_cell_distance,0),sticky='nsew') #columnspan
         self.heading.grid(row=0,column=1,sticky='nsew')
@@ -44,7 +44,7 @@ class Dayview(Frame):
 
         header=['Name', 'Menge', 'kCal']
         for col,columnheader in enumerate(header):
-            temp_label = Label(self.table_entries, text=columnheader, font=Fonts.hel_8_b) #später eigene Klasse, um Filtern zu ermöglichen
+            temp_label = Label(self.table_entries, text=columnheader, font=Fonts.hel_8_b) #todo später eigene Klasse, um Filtern zu ermöglichen
             temp_label.grid(column=col, row=0, padx=1,pady=1,sticky='nswe')
 
         self.update_day_view()
@@ -61,11 +61,21 @@ class Dayview(Frame):
             temp_row.append(Label(self.table_entries, text=entry.name, anchor='w'))
             temp_row.append(Label(self.table_entries, text=entry.amount))
             temp_row.append(Label(self.table_entries, text=entry.kCal))
-            for col, widget in enumerate(temp_row):
-                widget.grid(column=col, row=row+1,padx=1,pady=1,sticky='nswe')
-                widget.bind('<ButtonRelease-1>',self.food_dropped)
+            self.draw_food_entry_line(temp_row,row+1)
+
+        sum_name=Label(self.table_entries, text='GESAMT', bg=self.headline['background'])
+        sum_amount=Label(self.table_entries, text='',bg=self.headline['background'])
+        sum_kCal=Label(self.table_entries,text=self._today.kCal,bg=self.headline['background'])
+        self.draw_food_entry_line([sum_name,sum_amount,sum_kCal],self.table_entries.grid_size()[1])
+            
         self.table_entries.grid_columnconfigure(1,weight=1)
         self.table_entries.grid_columnconfigure(2,weight=1)
+        
+    def draw_food_entry_line(self,widgetlist,row_offset):
+        for col, widget in enumerate(widgetlist):
+                widget.grid(column=col, row=row_offset,padx=1,pady=1,sticky='nswe')
+                widget.bind('<ButtonRelease-1>',self.food_dropped)
+        
 
     def food_dropped(self,event):
         self['cursor']='heart'

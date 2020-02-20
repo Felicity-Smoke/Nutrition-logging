@@ -13,3 +13,10 @@ class Day(object):
     @property
     def food_entries(self):
         return self._foodlist
+
+    @property
+    def kCal(self):
+        kCal_sum=0
+        for food in self._foodlist:
+            kCal_sum+=food.kCal
+        return kCal_sum
