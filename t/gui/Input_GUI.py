@@ -1,4 +1,4 @@
-from tkinter import ttk, Entry, Label, Button, Frame, Tk, Menu
+from tkinter import ttk, Entry, Label, Button, Frame, Tk, Menu, Canvas
 from clsSearch import FoodSearch
 import sys
 from Search_code import FoodSearch as Search, Searchterm, FoodBasic
@@ -19,10 +19,10 @@ class Dayview(Frame):
         self.dayframe.grid(column=0,row=0, padx=Fonts.framedistance, pady=Fonts.framedistance)
         
         self.heading = Label(self.dayframe, text=self.date.strftime('%A %d. %B %Y'),font=Fonts.hel_11_b)
-        self.heading.grid(row=0,column=0,columnspan=5,padx=Fonts.table_cell_distance,pady=(Fonts.table_cell_distance,0),sticky='nsew') #columnspan
+        self.heading.grid(row=0,column=0,padx=Fonts.table_cell_distance,pady=(Fonts.table_cell_distance,0),sticky='nsew') #columnspan
 
         self.table_entries=Frame(self.dayframe,background=Fonts.table_bg)
-        self.table_entries.grid(row=1,column=0, columnspan=5,padx=Fonts.table_cell_distance,pady=(0,Fonts.table_cell_distance))
+        self.table_entries.grid(row=1,column=0,padx=Fonts.table_cell_distance,pady=(0,Fonts.table_cell_distance))
 
         header=['Name', 'Menge', 'kCal']
         for col,columnheader in enumerate(header):
@@ -49,8 +49,10 @@ Stand Input_Window:
 - schlechtes Naming - eigentlich wird hier nur ausgewählt, nicht eingegeben (Drag, aber kein Drop)
 
 + Suche funktioniert bereits gut, aktiviert durch Enter in der Suchleiste, in der Food.db gefundene Datensätze werden angezeigt
+- Suche funktioniert nur einmalig, dann Fehlermeldung!
 
 Next steps:
+- implement scrolling via canvas - half done :-///
 * Drag n Drop von Suchfenser zu Tagesfenser (inkl. Mauszeiger)
 '''
         
@@ -69,7 +71,7 @@ class Input_Window(Frame):
         self.searchline = Frame(self)      
         self.search_entry = Entry(self.searchline)
         self.search_entry.bind('<Return>', self.search_triggered)
-        self.category_box = ttk.Combobox(self.searchline, values=['Früchte','Süssigkeiten','Getreideprodukte, Hülsenfrüchte und Kartoffeln', 'Gemüse', 'Brote, Flocken und Frühstückscerealien','Nüsse, Samen und Ölfrüchte','Gerichte', 'Fette und Öle','Fisch','Speziallebensmittel','Salzige Snacks','Eier','Milch und Milchprodukte','Fleisch- und Wurstwaren','Fleisch und Innereien','Alkoholhaltige Getränke',''])
+        self.category_box = ttk.Combobox(self.searchline, values=['Früchte','Süssigkeiten','Getreideprodukte, Hülsenfrüchte und Kartoffeln', 'Gemüse', 'Brote, Flocken und Frühstückscerealien','Nüsse, Samen und Ölfrüchte','Gerichte', 'Fette und Öle','Fisch','Speziallebensmittel','Salzige Snacks','Eier','Milch und Milchprodukte','Fleisch- und Wurstwaren','Fleisch und Innereien','Alkoholhaltige Getränke','']) #todo: Kategorien auslagern
         self.category_box.bind("<<ComboboxSelected>>", self.category_changed)
         #vlt doch noch auf Listbox umändern, dann könnte man mehrere Kategorien auswählen
         self.search_btn = Button(self.searchline, text='Suchen')#, command=self.search_triggered()) todo
@@ -93,11 +95,19 @@ class Input_Window(Frame):
         self.choose_day.grid(column=3, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
 
         # found_food
-        self.found_food_frame=Frame(self, background=Fonts.table_bg)
-        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor='w', font=Fonts.hel_11_b, width=50)
-    
-        self.found_food_frame.grid(row=3, column=0, sticky='w', padx=Fonts.framedistance,pady=Fonts.framedistance) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
-        self.found_food_header.grid(column=0,row=0,columnspan=2,sticky='wesn', padx=1, pady=1)
+        self.results=Frame(self, background='blue')
+        self.canvas=Canvas(self.results, background='green')
+        self.scrollbar = ttk.Scrollbar(self.results, orient='vertical', command=self.canvas.yview)
+
+        self.found_food_frame=Frame(self.canvas, background=Fonts.table_bg)
+        self.canvas.create_window(0, 0, anchor='nw', window=self.found_food_frame,height=180,width=150)
+        
+        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor='w', font=Fonts.hel_11_b, width=50)     
+
+        self.results.grid(row=3,column=0,sticky='w',padx=Fonts.framedistance,pady=Fonts.framedistance) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
+        self.canvas.grid(row=0,column=0,padx=2,pady=2)#todo delete padding
+        self.found_food_frame.grid(row=0, column=0, sticky='wesn',padx=2,pady=2) #todo delete padding
+        self.found_food_header.grid(column=0,row=0,columnspan=3,sticky='wesn', padx=2, pady=2)
 
         self.day_frame = Dayview(self,Date.today())
         self.day_frame.grid(column=3, row=0, rowspan=3)
@@ -136,6 +146,15 @@ class Input_Window(Frame):
                 element.grid(row=row+1, column=col, padx=1,pady=1, sticky='wsen')
                 element.bind('<B1-Motion>',self.motion_active)
                 element.bind('<ButtonRelease-1>',self.motion_stopped)
+
+        #self.results['height']=150 todo: does not do anything
+        if len(self.found_foods)>10: #10 nur als bsp... todo: besseren wert überlegen, vlt skalierbar
+            self.canvas.update_idletasks() #no idea what this does
+            self.canvas.configure(yscrollcommand=self.scrollbar.set)
+            self.scrollbar.grid(row=0,column=1, sticky='ns',padx=2,pady=2)#,rowspan=10)
+        else:
+            self.scrollbar.grid_forget()
+            
 
     def motion_active(self,event):
         self['cursor']='fleur'
