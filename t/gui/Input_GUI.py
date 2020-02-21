@@ -101,6 +101,7 @@ Stand Input_Window:
 Next steps:
 - implement scrolling via canvas - half done :-///
 * Drag n Drop von Suchfenser zu Tagesfenser (inkl. Mauszeiger)
+- Button-commands hinzufügen
 '''
         
 class Input_Window(Frame):
@@ -130,16 +131,15 @@ class Input_Window(Frame):
 
         # input_navigation
         self.input_navigation = Frame(self)
-        self.last_foods = Button(self.input_navigation, text='Oft verwendete')
-        self.favourite_foods = Button(self.input_navigation, text='Favouriten')
-        self.yesterday = Button(self.input_navigation, text='Gestern')
-        self.choose_day = Button(self.input_navigation, text='Tag wählen')
+        self.input_navigation_buttons=[]
+        self.input_navigation_buttons.append(Button(self.input_navigation, text='Oft verwendete'))
+        self.input_navigation_buttons.append(Button(self.input_navigation, text='Favouriten'))
+        self.input_navigation_buttons.append(Button(self.input_navigation, text='Gestern'))
+        self.input_navigation_buttons.append(Button(self.input_navigation, text='Tag wählen'))
 
         self.input_navigation.grid(row=1,column=0, padx=Fonts.framedistance, pady=Fonts.framedistance,sticky='w')
-        self.last_foods.grid(column=0, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
-        self.favourite_foods.grid(column=1, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
-        self.yesterday.grid(column=2, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
-        self.choose_day.grid(column=3, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
+        for col,input_navigation_button in enumerate(self.input_navigation_buttons):
+            input_navigation_button.grid(column=col, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
 
         # found_food
         self.results=Frame(self)#, background='blue')
@@ -180,8 +180,7 @@ class Input_Window(Frame):
             if self.category:
                 if not self.category == found_food.category:
                     continue
-            #TODO: ID(key) hier wieder raus nehmen!
-            name_label = Label(self.found_food_frame, text=str(found_food.key)+'   '+found_food.name, anchor='w') #todo: mehrzeilig
+            name_label = Label(self.found_food_frame, text=found_food.name, anchor='w') 
             category_label = Label(self.found_food_frame, text=found_food.category, anchor='w')
             self.found_food_labels.append([name_label,category_label])
         self.update_found_food_view()

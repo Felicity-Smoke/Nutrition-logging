@@ -1,4 +1,4 @@
-from tkinter import Button,Frame,Label,Tk,Menu,ttk, FLAT as relief
+from tkinter import Button,Frame,Label,Tk,Menu,ttk
 import locale
 from clsMonth import Month, number_color
 from clsCalendarDay import CalendarDay
@@ -39,9 +39,9 @@ class Calendar (Frame):
         parent.grid_rowconfigure(0,minsize=100)
 
         #header
-        self.button_former_month = Button(self.calendar_month_frame,text='<',command=self.goto_previous_month,relief=relief)
+        self.button_former_month = Button(self.calendar_month_frame,text='<',command=self.goto_previous_month,relief='flat')
         self.month_heading = Label(self.calendar_month_frame,font=Fonts.hel_10)
-        self.button_next_month = Button(self.calendar_month_frame,text='>',command=self.goto_next_month,relief=relief)
+        self.button_next_month = Button(self.calendar_month_frame,text='>',command=self.goto_next_month,relief='flat')
 
         self.button_former_month.grid(column=0,row=0,padx=self.padx,pady=self.pady,sticky='nsew')
         self.month_heading.grid(column=1,row=0,padx=self.padx,pady=self.pady,columnspan=5,sticky='nsew')

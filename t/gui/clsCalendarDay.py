@@ -1,4 +1,4 @@
-from tkinter import Button,Frame,Label, E as anchor_east
+from tkinter import Button,Frame,Label
 
 class CalendarDay(Frame):
     def __init__(self,master=None, text='', fg='', cnf={}, **kw):
@@ -19,7 +19,7 @@ class CalendarDay(Frame):
         if fg=='':
             fg='black' #default
             
-        self.day_label=Label(self,text=self.day,background=self['background'],fg=fg,anchor=anchor_east)
+        self.day_label=Label(self,text=self.day,background=self['background'],fg=fg,anchor='e')
         self.day_label.grid(column=0,row=0)
         self.day_label.bind('<Button-1>', self.clicked_day)
         self.day_label.bind('<Double-1>', self.double_clicked_day)

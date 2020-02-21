@@ -66,18 +66,15 @@ class FoodSearch(object):
     def __init__(self, searchterm_obj):
         db_connection=sqlite3.connect('Food.db')
         cursor = db_connection.cursor()
-        found_food_names = []
-        self.all_results = []
+        found_food_names=[]
+        self.all_results=[]
 
         for food_name in FoodSearch.all_entries_by_name:
             if searchterm_obj.does_match(food_name):
-                found_food_names.append(food_name)
-
-        for found_food_name in found_food_names:
-            cursor.execute('SELECT id, Name, Kategorie, kCal FROM Food WHERE Name=?', (found_food_name,))
-            result = cursor.fetchone()
-            if result:
-                self.all_results.append(ShortFoodEntry(result[0],100,name=result[1],category=result[2],cal_100g=result[3]))
+                cursor.execute('SELECT id, Name, Kategorie, kCal FROM Food WHERE Name=?', (food_name,))
+                result = cursor.fetchone()
+                if result:
+                    self.all_results.append(ShortFoodEntry(result[0],100,name=result[1],category=result[2],cal_100g=result[3]))
 
             #cursor.execute('SELECT {name}, {category} FROM {food} WHERE Name={searched} LIMIT {limit}'.\
             #format(name = FoodSearch.db_label_name, category = FoodSearch.db_label_category, searched = found_food_name, food = FoodSearch.db_food_table, limit = max_hits_shown))
@@ -85,7 +82,7 @@ class FoodSearch(object):
         db_connection.close()
 
         #Wird nichts gefunden Fuzzy-Methode anwenden
-        if searchterm_obj.is_search_vague_active == True and len(found_food_names)<30:
+        if searchterm_obj.is_search_vague_active == True and len(self.all_results)<30:
             self.search_vague(searchterm_obj)
 
         #for row in self.all_results:
