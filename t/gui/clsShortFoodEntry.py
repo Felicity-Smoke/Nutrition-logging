@@ -2,11 +2,12 @@
 short weg bringen, vollständige Food klasse daraus machen!
 '''
 class ShortFoodEntry(object):
-    def __init__(self, key, amount):
+    def __init__(self, key, amount, name='',category='',cal_100g=0):
         self._key = key
         self._amount = amount
-        self._name=''
-        self._category=''
+        self._name=name
+        self._category=category
+        self._calories_per_100=cal_100g
 
     @property
     def name(self):
@@ -27,17 +28,17 @@ class ShortFoodEntry(object):
         self._category=value
         
     @property
-    def kCal(self):
-        return self._kCal_per_100*self.amount/100
+    def calories(self):
+        return self._calories_per_100*self.amount/100
             
     @property
-    def kCal_per_100(self):
-        return self._kCal_per_100
+    def calories_per_100(self):
+        return self._calories_per_100
 
-    @kCal_per_100.setter
-    def kCal_per_100(self,value):
+    @calories_per_100.setter
+    def calories_per_100(self,value):
         if type(value) is int or type(value) is float:
-            self._kCal_per_100 = value
+            self._calories_per_100 = value
     
     @property
     def key(self):

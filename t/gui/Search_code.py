@@ -1,6 +1,7 @@
 import sqlite3
 import re
 from datetime import date
+from clsShortFoodEntry import ShortFoodEntry
 
 '''
 - Durcheinander
@@ -9,31 +10,6 @@ from datetime import date
   alle zutreffenden Datensätze aus einer sqlite3-Datenbank gelesen
   
 '''
-class FoodBasic(object):
-    def __init__(self, argumentlist):
-        self.__key=argumentlist[0]
-        self.__name= argumentlist[1].rstrip(', ;')
-        self.__category=argumentlist[2].rstrip(', ;')
-        self.__calories=argumentlist[3]
-
-    @property
-    def name(self):
-        return self.__name
-
-    @property
-    def key(self):
-        return self.__key
-
-    @property
-    def category(self):
-        return self.__category
-
-    @property
-    def calories(self):
-        return self.__calories
-
-    def __str__(self):
-        return str(self.__key)+ ', '+self.__name+', '+self.__category+', '+str(self.__calories)
     
 class Searchterm(object):
     def __init__(self, searchterm, vague_search=False, category=''):
@@ -84,9 +60,12 @@ class FoodSearch(object):
     all_entries_by_name = [] #ToDo: als member, call o.Ä.
     for entry in cursor.fetchall():
         all_entries_by_name.append(entry[0])
-        
+
+    db_connection.close()
+    
     def __init__(self, searchterm_obj):
-        cursor = FoodSearch.cursor     
+        db_connection=sqlite3.connect('Food.db')
+        cursor = db_connection.cursor()
         found_food_names = []
         self.all_results = []
 
@@ -98,12 +77,12 @@ class FoodSearch(object):
             cursor.execute('SELECT id, Name, Kategorie, kCal FROM Food WHERE Name=?', (found_food_name,))
             result = cursor.fetchone()
             if result:
-                self.all_results.append(FoodBasic(result))
+                self.all_results.append(ShortFoodEntry(result[0],100,name=result[1],category=result[2],cal_100g=result[3]))
 
             #cursor.execute('SELECT {name}, {category} FROM {food} WHERE Name={searched} LIMIT {limit}'.\
             #format(name = FoodSearch.db_label_name, category = FoodSearch.db_label_category, searched = found_food_name, food = FoodSearch.db_food_table, limit = max_hits_shown))
                 
-        FoodSearch.db_connection.close()
+        db_connection.close()
 
         #Wird nichts gefunden Fuzzy-Methode anwenden
         if searchterm_obj.is_search_vague_active == True and len(found_food_names)<30:
@@ -153,7 +132,7 @@ class FoodSearch(object):
 
     def show_results(self):
         for food in self.all_results:
-            print(food)
+            print(food.name + '  ' + str(food.calories))
             
 if __name__ == '__main__':
 

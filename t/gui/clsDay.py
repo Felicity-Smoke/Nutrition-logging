@@ -15,8 +15,8 @@ class Day(object):
         return self._foodlist
 
     @property
-    def kCal(self):
-        kCal_sum=0
+    def calories(self):
+        calories_sum=0
         for food in self._foodlist:
-            kCal_sum+=food.kCal
-        return kCal_sum
+            calories_sum+=food.calories
+        return calories_sum
