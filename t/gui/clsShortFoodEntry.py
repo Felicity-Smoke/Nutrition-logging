@@ -43,6 +43,12 @@ class ShortFoodEntry(object):
     @property
     def key(self):
         return self._key
+    
     @property
     def amount(self):
         return self._amount
+        
+    @amount.setter
+    def amount(self,value):
+        if type(value) is int or type(value) is float:
+            self._amount=value

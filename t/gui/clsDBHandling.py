@@ -1,6 +1,6 @@
 import sqlite3
 from clsShortFoodEntry import ShortFoodEntry
-
+from datetime import date as Date
 '''
 - Konzept noch verbesserungsfähig! Init, klassenvariablen, ...
 
@@ -15,23 +15,15 @@ class DBHandling:
         try:
             self._open_db()
             cursor=self._db.cursor()
-
-            #db_timestring: YYYY,MM,DD -> Wieso?? Todo: umändern!
-            month = str(date.month)
-            if len(month)==1:
-                month='0'+month
-            day=str(date.day)
-            if len(day)==1:
-                day='0'+day
-            db_timestring = str(date.year) + ',' + month + ',' + day
         
-            cursor.execute('SELECT Food_ID, Menge FROM FoodEntries WHERE Datum=?',(db_timestring,))
+            cursor.execute('SELECT Food_ID, Menge FROM FoodEntries WHERE Datum=?',(str(date),))
             result = cursor.fetchone()
         
             while result:
                 entries_from_date.append(ShortFoodEntry(result[0],result[1]))
                 result = cursor.fetchone()
         except:
+            pass
         finally:
             self._close_db()
         return entries_from_date
@@ -49,6 +41,7 @@ class DBHandling:
             cursor.execute('SELECT Name, Kategorie, kCal FROM Food WHERE id=?', (short_food_entry.key,))
             result=cursor.fetchone()
         except:
+            pass
         finally:
             self._close_db()
 
@@ -59,7 +52,7 @@ class DBHandling:
         else:
             print('ID' + str(entry.key) + ' not found in database!')
 
-    def write_entry(self, date, food):#untested!
+    def write_entry(self, date, food):
         try:
             self._open_db()
             cursor=self._db.cursor()
@@ -69,10 +62,41 @@ class DBHandling:
             cursor.fetchone()
             self._db.commit()            
         except:
+            pass
         finally:
             self._close_db()
             
     def _open_db(self):
-        self._db=sqlit3.connect('Food.db')
+        self._db=sqlite3.connect('Food.db')
     def _close_db(self):
         self._db.close()
+
+if __name__ == '__main__':
+    read1=True
+    read2=True
+    write=False
+    
+    db = DBHandling()
+
+    # read entrys from day
+    if read1:
+        entries = db.read_entrys_from_day(Date(2020,2,25))
+        print(str(len(entries)))
+        for entry in entries:
+
+            # get food information
+            if read2:
+                db.get_food_information(entry)
+                print(str(entry.key) + ' ' + entry.name)
+            else:
+                print(str(entry.key))
+
+    # write entry
+    if write:
+        food = entries[0]
+        food.amount=999
+        food._key+=1 # Zugriff auf '_' - Variable nur für Testzweck!
+        db.write_entry(Date.today(),food)
+
+
+        
