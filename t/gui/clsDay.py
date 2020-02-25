@@ -3,7 +3,6 @@ from clsDBHandling import DBHandling
 from clsShortFoodEntry import ShortFoodEntry
 
 class Day(object):
-    #imports: date, dbhandling, shortfoodentry
     def __init__(self, date):
         self._date=date
         self._db_handling = DBHandling()
@@ -19,4 +18,4 @@ class Day(object):
         calories_sum=0
         for food in self._foodlist:
             calories_sum+=food.calories
-        return calories_sum
+        return format(calories_sum, '.2f')

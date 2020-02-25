@@ -32,10 +32,11 @@ class DBHandling:
 
     def get_several_food_information(self, list_of_food):
         for food in list_of_food:
-            self.get_food_information(food)
+            self._get_food_information(food)
 
-    def get_food_information(self, short_food_entry):
-
+    def _get_food_information(self, short_food_entry):
+        result=None
+        
         try:
             self._open_db()
             cursor=self._db.cursor()
@@ -50,7 +51,7 @@ class DBHandling:
         if result:
             short_food_entry.name=result[0]
             short_food_entry.category=result[1]
-            short_food_entry.kCal_per_100=result[2]
+            short_food_entry.calories_per_100=result[2]
         else:
             print('ID' + str(entry.key) + ' not found in database!')
 
