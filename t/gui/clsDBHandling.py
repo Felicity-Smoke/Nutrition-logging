@@ -5,6 +5,7 @@ from datetime import date as Date
 - Konzept noch verbesserungsfähig! Init, klassenvariablen, ...
 
 + die Klasse existiert zumindest und wird verwendet
++ Tests sind vorhanden
 '''
 class DBHandling:
     def __init__(self):
@@ -26,11 +27,12 @@ class DBHandling:
             pass
         finally:
             self._close_db()
+            
         return entries_from_date
 
     def get_several_food_information(self, list_of_food):
         for food in list_of_food:
-            self.get_food_information(self,food)
+            self.get_food_information(food)
 
     def get_food_information(self, short_food_entry):
 
@@ -91,12 +93,12 @@ if __name__ == '__main__':
             else:
                 print(str(entry.key))
 
-    # write entry
-    if write:
-        food = entries[0]
-        food.amount=999
-        food._key+=1 # Zugriff auf '_' - Variable nur für Testzweck!
-        db.write_entry(Date.today(),food)
+        # write entry
+        if write:
+            food = entries[0]
+            food.amount=999
+            food._key+=1 # Zugriff auf '_' - Variable nur für Testzweck!
+            db.write_entry(Date.today(),food)
 
 
         
