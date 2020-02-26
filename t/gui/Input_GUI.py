@@ -96,10 +96,12 @@ Stand Input_Window:
 - sieht eher mies aus
 - schlechtes Naming - eigentlich wird hier nur ausgewählt, nicht eingegeben (Drag, aber kein Drop)
 
-+ Suche funktioniert bereits gut, aktiviert durch Enter in der Suchleiste, in der Food.db gefundene Datensätze werden angezeigt
++ Suche funktioniert bereits gut, aktiviert durch Enter in der Suchleiste,
+    in der Food.db gefundene Datensätze werden inkl. Scrollbar angezeigt
 
 Next steps:
-- implement scrolling via canvas - half done :-///
+- Scrollbar über Mausrad aktivieren - binding
+- Namenslabel für foods begrenzen oder Feld in db (wenn in db, dann auch gleich tailing commas vernichten)
 * Drag n Drop von Suchfenser zu Tagesfenser (inkl. Mauszeiger)
 - Button-commands hinzufügen
 '''
@@ -112,7 +114,6 @@ class Input_Window(Frame):
         self.active=False
         self.grid(row=0,column=0)
         
-        self.found_food_labels =[]
         self.category=''
 
         # searchline
@@ -142,23 +143,28 @@ class Input_Window(Frame):
             input_navigation_button.grid(column=col, row=0, padx=Fonts.framedistance, pady=0, sticky='w')
 
         # found_food
-        self.results=Frame(self)#, background='blue')
-        self.canvas=Canvas(self.results, background='green')
+        self.results=Frame(self)
+        self.canvas=Canvas(self.results)
         self.scrollbar = ttk.Scrollbar(self.results, orient='vertical', command=self.canvas.yview)
-
+        self.canvas.bind('<MouseWheel>',self.onMouseWheel)
         self.found_food_frame=Frame(self.canvas, background=Fonts.table_bg)
-        self.canvas.create_window(0, 0, anchor='nw', window=self.found_food_frame,height=180,width=150)
-        
-        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor='w', font=Fonts.hel_11_b, width=50)     
+        self.found_food_frame.bind('<MouseWheel>',self.onMouseWheel)
+        self.canvas.create_window(0, 0, anchor='nw', window=self.found_food_frame)
+        self.canvas.config(yscrollcommand=self.scrollbar.set)
+        self.found_food_header=Label(self.found_food_frame, text='Suchergebnisse:', anchor='w', font=Fonts.hel_11_b )     
 
-        self.results.grid(row=3,column=0,sticky='w',padx=Fonts.framedistance,pady=Fonts.framedistance) #ToDo row/columnspan sinnvoll u. vlt als variable festlegene
-        self.canvas.grid(row=0,column=0,padx=2,pady=2)#todo delete padding
-        self.found_food_frame.grid(row=0, column=0, sticky='wesn',padx=2,pady=2) #todo delete padding
+        self.results.grid(row=3,column=0,sticky='w',padx=Fonts.framedistance,pady=Fonts.framedistance) 
+        self.canvas.grid(row=0,column=0)
         self.found_food_header.grid(column=0,row=0,columnspan=3,sticky='wesn', padx=2, pady=2)
 
+        # Dayview
         self.day_frame = Dayview(self,Date.today())
         self.day_frame.grid(column=3, row=0, rowspan=3)
 
+    def onMouseWheel(self,event):
+        self.canvas.yview("scroll",event.delta,"units")
+        return
+    
     def category_changed(self,event):
         self.category = self.category_box.get()
         self.create_new_found_food_labels()
@@ -175,33 +181,31 @@ class Input_Window(Frame):
                 
     def create_new_found_food_labels(self):
         self.del_old_found_foods()
-        self.found_food_labels=[]
+        found_food_labels=[]
         for found_food in self.found_foods:
             if self.category:
                 if not self.category == found_food.category:
                     continue
             name_label = Label(self.found_food_frame, text=found_food.name, anchor='w') 
             category_label = Label(self.found_food_frame, text=found_food.category, anchor='w')
-            self.found_food_labels.append([name_label,category_label])
-        self.update_found_food_view()
+            found_food_labels.append([name_label,category_label])
+        self.update_found_food_view(found_food_labels)
 
-    def update_found_food_view(self):
+    def update_found_food_view(self,found_food_labels):
         self.del_old_found_foods()
-        for row,food in enumerate(self.found_food_labels):
+        for row,food in enumerate(found_food_labels):
             for col,element in enumerate(food):
                 element.grid(row=row+1, column=col, padx=1,pady=1, sticky='wsen')
                 element.bind('<B1-Motion>',self.motion_active)
                 element.bind('<ButtonRelease-1>',self.motion_stopped)
 
-        #self.results['height']=150 todo: does not do anything
         if len(self.found_foods)>10: #10 nur als bsp... todo: besseren wert überlegen, vlt skalierbar
-            self.canvas.update_idletasks() #no idea what this does
-            self.canvas.configure(yscrollcommand=self.scrollbar.set)
-            self.scrollbar.grid(row=0,column=1, sticky='ns',padx=2,pady=2)#,rowspan=10)
+            self.canvas.update_idletasks()
+            self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+            self.scrollbar.grid(row=0,column=1, sticky='ns')
         else:
             self.scrollbar.grid_forget()
-            
-
+        
     def motion_active(self,event):
         self['cursor']='fleur'
 

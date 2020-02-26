@@ -47,9 +47,10 @@ class Window(Frame):
                 element.grid(row=row+1, column=col, padx=1,pady=1, sticky='wsen')
 
         if len(self.found_foods)>10: #10 nur als Bsp
-            self.canvas.update_idletasks() #no idea what this does
+            0self.canvas.update_idletasks() #no idea what this does
             self.canvas.config(yscrollcommand=self.scrollbar.set)
             self.canvas.config(height=250,width=300)
+            self.canvas.configure(scrollregion=self.canvas.bbox('all'))
             self.scrollbar.grid(row=0,column=1, sticky='ns',padx=2,pady=2)
         else:
             self.scrollbar.grid_forget()
