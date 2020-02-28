@@ -1,8 +1,10 @@
-from tkinter import Button,Frame,Label,Tk,Menu,ttk
+from tkinter import Button,Frame,Label,Tk,Menu,ttk,IntVar
 import locale
 from clsMonth import Month, number_color
 from clsCalendarDay import CalendarDay
+from clsDay import Day
 from Fonts import Fonts
+from datetime import date as Date
 
 '''
 Kalender (ähnlich wie Windows-Version)
@@ -59,16 +61,20 @@ class Calendar (Frame):
         
         '''
         Optionen
-        
-        self.feature_list = []
-        self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit Fleischkonsum kennzeichnen'))
-        self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit Milchkonsum kennzeichnen'))
-        self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit pflanzlicher Ernährung kennzeichnen'))
-        self.feature_list.append(ttk.Checkbutton(parent,text='Kalorienbilanz des Tages darstellen'))
-        self.feature_list.append(ttk.Checkbutton(parent,text='Tage mit Eiweißdefizit kennzeichnen'))
-
-        self.position_widget_list(self.feature_list, column=1)
         '''
+
+        self.feature_frame=Frame(parent)
+        self.feature_frame.grid(row=0,column=1)
+        self.feature_list = []
+        self.show_is_vegan = IntVar()
+        self.feature_list.append(ttk.Checkbutton(self.feature_frame,text='Tage mit Fleischkonsum kennzeichnen'))
+        self.feature_list.append(ttk.Checkbutton(self.feature_frame,text='Tage mit Milchkonsum kennzeichnen'))
+        self.feature_list.append(ttk.Checkbutton(self.feature_frame,variable=self.show_is_vegan, text='Tage mit pflanzlicher Ernährung kennzeichnen',command=self.show_vegan_days_CB_changed))
+        self.feature_list.append(ttk.Checkbutton(self.feature_frame,text='Kalorienbilanz des Tages darstellen'))
+        self.feature_list.append(ttk.Checkbutton(self.feature_frame,text='Tage mit Eiweißdefizit kennzeichnen'))
+
+        self.position_widget_list(self.feature_list)
+        
 
         # Kontextmenü
         self.menu_food = Menu(self, font="TkMenuFont", tearoff=0)
@@ -77,7 +83,16 @@ class Calendar (Frame):
 
         self.menu_meal = Menu(self, font='TkMenuFont', tearoff=0)
         self.menu_meal.add_command(label='Zutaten anpassen')
+
+    def show_vegan_days_CB_changed(self):
+        if self.show_is_vegan.get():
+            for dayline in self.container_days:
+                for day in dayline:
+                    if day.from_actual_month:
+                        if Day(Date(self.month.year,self.month.month,day.day)).is_vegan:
+                            day.add_logo('vegan') #'vegan' noch in besseres Format umwandeln
                 
+        
     def goto_next_month(self):
         self.month = self.month.next()
         self.update_displayed_month()
