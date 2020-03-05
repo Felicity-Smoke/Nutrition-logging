@@ -14,7 +14,7 @@ class Day(object):
         self._db_handling.get_several_food_information(self._foodlist)
         self._category_list=[]
 
-    def _get_category_list():
+    def _get_category_list(self):
         for food in self._foodlist:
             if not food.category in self._category_list:
                 self._category_list.append(food.category)
@@ -30,15 +30,14 @@ class Day(object):
             calories_sum+=food.calories
         return format(calories_sum, '.2f')
 
-    def is_vegan(self):
-        not_vegan = ['Eier','Fisch','Milch und Milchprodukte', 'Fleisch- und Wurstwaren','Fleisch und Innereien']
+    def meets_criterias(self, categories, needed): #rename!!
         if len(self._category_list)<1:
             self._get_category_list()
-            
-        for each in not_vegan:
+
+        for each in categories:
             if each in self._category_list:
-                print('return not vegan')
-                return False
-        print('return vegan')
-        return True
-                
+                if needed == True:
+                    return True
+                else:
+                    return False
+        return not needed              

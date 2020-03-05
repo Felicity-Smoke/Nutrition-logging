@@ -1,4 +1,6 @@
-from tkinter import Button,Frame,Label,PhotoImage, Tk 
+from tkinter import Button,Frame,Label,PhotoImage, Tk
+from Fonts import Fonts
+
 class DayClickedEvent():
     def __init__(self, day):
         self._day=day
@@ -18,10 +20,10 @@ class Logo():
 class Logos():
     MAX_ACTIVE_LOGOS = 3
     
-    vegan=Logo('vegan', 'Icons/green.png')
-    #diary=Logo('')
-    #meat=Logo('')
-    #caloriebilanz=Logo('')
+    vegan=Logo('vegan','Icons/green.png')
+    dairy=Logo('dairy','Icons/dairy.png')
+    meat=Logo('meat','Icons/meat.png')
+    #caloriebilanz=Logo('calories',)
     
     def __init__(self):
         pass
@@ -54,7 +56,7 @@ class CalendarDay(Frame):
 
         self.logolabels=[]
         for i in range(Logos.MAX_ACTIVE_LOGOS):
-            self.logolabels.append(Label(self.logo_frame, image='', width=1,height=1,background=self['background']))
+            self.logolabels.append(Label(self.logo_frame, image='', width=1,height=1,background=self['background'],font=Fonts.mini))
 
         for column,logolabel in enumerate(self.logolabels):
             logolabel.grid(row=0,column=column,padx=1,pady=1,sticky='nswe')
@@ -106,7 +108,15 @@ class CalendarDay(Frame):
             self.active_logos.append(logo.name)
             return True
         return False
-                              
+
+    def add_text(self, text):
+        nr_of_logos=len(self.active_logos) #rename! vlt. nr_of_items
+        if nr_of_logos<4 and not 'text' in self.active_logos:
+            self.logolabels[nr_of_logos].configure(text=text)
+            self.active_logos.append('text')
+            return True
+        return False
+    
     def delete_logo(self, logo):
         for i,logoitem in enumerate(self.active_logos):
             if logoitem==logo.name:
@@ -114,9 +124,16 @@ class CalendarDay(Frame):
                 self.logolabels[i].configure(image=img)
                 self.logolabels[i].image=img
                 del self.active_logos[i]
-                              
-    def delete_all_logos(self):
+
+    def delete_text(self):
+        for i,logoitem in enumerate(self.active_logos):
+            if logoitem=='text':
+                self.logolabels[i].configure(text='')
+                del self.active_logos[i]
+                
+    def delete_all_logos(self): #rename .. items
         for label in self.logolabels:
+            label.configure(text='')
             img=''
             label.configure(image=img)
             label.image=img

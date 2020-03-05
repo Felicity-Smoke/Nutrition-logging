@@ -6,6 +6,7 @@ class Fonts (object):
 
     hel_8_b='Helvetica 8 bold'
     hel_10='Helvetica 10'
+    mini='Helvetica 5'
 
     mainbutton_font='Helvetica 10'
 
