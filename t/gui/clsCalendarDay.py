@@ -1,56 +1,36 @@
-from tkinter import Button,Frame,Label,PhotoImage
+from tkinter import Button,Frame,Label,PhotoImage, Tk 
 class DayClickedEvent():
     def __init__(self, day):
         self._day=day
 
 class Logo():
-    def __init__(self, png):
+    def __init__(self, name, png):
+        self._name=name
         self._filepath=png
-        
-        
+
+    @property
+    def image(self):
+        return PhotoImage(file=self._filepath)
+
+    def name(self):
+        return self._name
+         
 class Logos():
     MAX_ACTIVE_LOGOS = 3
+    
+    vegan=Logo('vegan', 'Icons/green.png')
+    #diary=Logo('')
+    #meat=Logo('')
+    #caloriebilanz=Logo('')
+    
     def __init__(self):
-        self._plant_logo = PhotoImage(file="Icons/green.png") #subsample(size_image,size_image)
-        self._active_logos =[]
-        self._unprocessed_changes = False
-
-    def add_logo(self,logo):
-        if len(self._active_logos)<MAX_ACTIVE_LOGOS:
-            self._active_logos.append(logo)
-            return True
-        else:
-            return False
-
-    def delete_logo(self,logo):
-        if logo in self._active_logos:
-            self._active_logos.remove(logo)
-            self._unprocessed_changes = True
-
-    def delete_all_logos(self):
-        if len(self._active_logos)>0:
-            self._unprocessed_changes = True
-            self._active_logos=[]
-        
-    @property
-    def plant_logo(self):
-        return self._plant_logo
-    
-    @property
-    def unprocessed_changes(self):
-        return self._unprocessed_changes
-    
-    @unprocessed_changes.setter
-    def unprocessed_changes(self,value):
-        if type(value) is bool:
-            self._unprocessed_changes=value        
+        pass
         
 class CalendarDay(Frame):
     def __init__(self,master=None, text='', fg='black', cnf={}, **kw):
         Frame.__init__(self,master, cnf, **kw)
         self._day_text=text
         self.double_clicked=False
-        self.logos=Logos()
 
         self.active_color = 'whitesmoke'
         self.passive_color = 'lightgrey'
@@ -68,17 +48,16 @@ class CalendarDay(Frame):
         #self.day_label.bind('<Double-1>', self.double_clicked_day)
         self.day_label.lower() #does not work!
 
+        self.active_logos=[]
         self.logo_frame=Frame(self,background=self['background'])
         self.logo_frame.grid(column=0,row=1)
 
-        size=1
-        self.logo1=Label(self.logo_frame,width=size,height=size,background=self['background'])
-        self.logo2=Label(self.logo_frame,width=size,height=size,background=self['background'])
-        self.logo3=Label(self.logo_frame,width=size,height=size,background=self['background'])
-        logolabels = [self.logo1,self.logo2,self.logo3]
-        for column,logo in enumerate(logolabels):
-            logo.grid(row=0,column=column,padx=1,pady=1,sticky='nswe')
-        
+        self.logolabels=[]
+        for i in range(Logos.MAX_ACTIVE_LOGOS):
+            self.logolabels.append(Label(self.logo_frame, image='', width=1,height=1,background=self['background']))
+
+        for column,logolabel in enumerate(self.logolabels):
+            logolabel.grid(row=0,column=column,padx=1,pady=1,sticky='nswe')
             
     def on_enter(self, e):
         self.set_active()      
@@ -119,19 +98,30 @@ class CalendarDay(Frame):
         self.day_label['foreground']=new_color
 
     def add_logo(self, logo):
-        #self.active_logos.append(self.logos.plant_logo)
-        #self.logo1['text']='text'
-        img=PhotoImage(file="Icons/green.png")
-        self.logo1.configure(image=img)
-        self.logo1.image = img
-
+        nr_of_logos=len(self.active_logos)
+        if nr_of_logos<4 and not logo.name in self.active_logos:
+            img=logo.image
+            self.logolabels[nr_of_logos].configure(image=img)
+            self.logolabels[nr_of_logos].image=img
+            self.active_logos.append(logo.name)
+            return True
+        return False
+                              
     def delete_logo(self, logo):
-        print('delete_logo in ClsCalendarDay unfinished')
-        self.logos.delete_logo(logo)
-
+        for i,logoitem in enumerate(self.active_logos):
+            if logoitem==logo.name:
+                img=''
+                self.logolabels[i].configure(image=img)
+                self.logolabels[i].image=img
+                del self.active_logos[i]
+                              
     def delete_all_logos(self):
-        self.logos.delete_all()
-        
+        for label in self.logolabels:
+            img=''
+            label.configure(image=img)
+            label.image=img
+        self.active_logos=[]
+                              
     @property
     def number(self):#sollte gelöscht werden, number ist komische bezeichnung!
         return self._day_text
@@ -161,4 +151,11 @@ class CalendarDay(Frame):
     def event_done(self):
         print('not implemented yet')
         return
+    
+if __name__ == '__main__':
+    root = Tk()
+    window = CalendarDay(root,1)
+    window.grid(row=0,column=0)
+    window.add_logo(Logos.vegan)
+    #how to wait?
     

@@ -1,7 +1,7 @@
 from tkinter import Button,Frame,Label,Tk,Menu,ttk,IntVar
 import locale
 from clsMonth import Month, number_color
-from clsCalendarDay import CalendarDay
+from clsCalendarDay import CalendarDay, Logos
 from clsDay import Day
 from Fonts import Fonts
 from datetime import date as Date
@@ -75,7 +75,6 @@ class Calendar (Frame):
 
         self.position_widget_list(self.feature_list)
         
-
         # Kontextmenü
         self.menu_food = Menu(self, font="TkMenuFont", tearoff=0)
         self.menu_food.add_command(label="Eigenschaften", command=self.food_properties)
@@ -86,12 +85,19 @@ class Calendar (Frame):
 
     def show_vegan_days_CB_changed(self):
         if self.show_is_vegan.get():
+            success=True
             for dayline in self.container_days:
                 for day in dayline:
                     if day.from_actual_month:
                         if Day(Date(self.month.year,self.month.month,day.day)).is_vegan:
-                            day.add_logo('vegan') #'vegan' noch in besseres Format umwandeln
-                
+                            success = success and day.add_logo(Logos.vegan)
+            if not success:
+                print('Es konnten nicht alle Symbole gesetzt werden')
+        
+        else:
+            for dayline in self.container_days:
+                for day in dayline:
+                    day.delete_logo(Logos.vegan)
         
     def goto_next_month(self):
         self.month = self.month.next()
