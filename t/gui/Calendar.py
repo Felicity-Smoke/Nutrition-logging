@@ -95,7 +95,7 @@ class Calendar (Frame):
                     if day.from_actual_month:
                         if self.show_calories.get():
                             sum_calories=float(Day(Date(self.month.year,self.month.month,day.day)).calories)
-                            day.add_text(format(sum_calories/2000, '.0f')) #2000 als Richtwert!
+                            day.add_text(format(sum_calories*100/2000, '.0f')) #2000 als Richtwert!
                         else:
                             day.delete_text()
 
