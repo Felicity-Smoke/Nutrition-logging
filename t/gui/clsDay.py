@@ -18,7 +18,16 @@ class Day(object):
         for food in self._foodlist:
             if not food.category in self._category_list:
                 self._category_list.append(food.category)
-                
+
+    def add(self,food):
+        self._db_handling.write_entry(self._date, food)
+        self._reload()
+
+    def _reload(self):
+        self._foodlist=self._db_handling.read_entrys_from_day(self._date)
+        self._db_handling.get_several_food_information(self._foodlist)
+        self._category_list=[]
+        
     @property
     def food_entries(self):
         return self._foodlist

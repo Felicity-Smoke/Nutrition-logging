@@ -1,10 +1,23 @@
-from tkinter import ttk, Label, Button, Frame, Tk, Canvas
+from tkinter import ttk, Label, Button, Frame, Tk, Canvas, Toplevel
 import sys
 from Fonts import Fonts
 from clsDay import Day
 import locale
 from datetime import date as Date, timedelta
 
+class Amount(Frame):
+    def __init__(self,parent,food):
+        food.amount=111
+        
+class Win2:
+    def __init__(self, root):
+        self.root = root
+        self.root.geometry("300x300+200+200")
+        self.root["bg"] = "navy"
+
+        #f1=Frame(window,background='pink')
+        #Nutrient_Goals_GUI(window)  
+        
 class Dayview(Frame):
     '''
     Todo's:
@@ -47,6 +60,12 @@ class Dayview(Frame):
 
         self.update_day_view()
 
+    def add(self,foods):
+        for food in foods:
+            Amount(self,food)
+        self._today.add(food)
+        self.update_day_view()
+
     def update_day_view(self):
         self.heading['text'] = self._date.strftime('%A %d. %B %Y')
         self._today=Day(self._date)
@@ -72,10 +91,6 @@ class Dayview(Frame):
     def draw_food_entry_line(self,widgetlist,row_offset):
         for col, widget in enumerate(widgetlist):
                 widget.grid(column=col, row=row_offset,padx=1,pady=1,sticky='nswe')
-                widget.bind('<ButtonRelease-1>',self.food_dropped)
-        
-    def food_dropped(self,event):
-        self['cursor']='heart'
 
     def next_day(self):
         self._date+=timedelta(days=1)

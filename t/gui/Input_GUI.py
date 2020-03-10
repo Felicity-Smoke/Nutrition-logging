@@ -5,28 +5,74 @@ from Fonts import Fonts
 from datetime import date as Date, timedelta
 from clsDayview import Dayview
 
+class DragAndDrop():
+    def __init__(self, parent):
+        self._parent=parent
+        self.dragged=False
+        self.to_drop=[]
+        self.target=None
+
+    def add_target(self,target):
+        self.target=target
+        
+    def add_dragable(self, widget):
+        widget.bind("<ButtonPress-1>", self.on_start)
+        widget.bind("<B1-Motion>", self.on_drag)
+        widget.bind("<ButtonRelease-1>", self.on_drop)
+        widget.configure(cursor="hand1")
+
+    def on_start(self, event):
+        # you could use this method to create a floating window
+        # that represents what is being dragged.
+        self._parent.configure(cursor='fleur')
+        pass
+
+    def on_drag(self, event):
+        if not self.dragged:
+            self.dragged=True
+            try:
+                self.to_drop.append(event.widget.master._food)
+                self._parent.configure(cursor='fleur')
+            except:
+                self.dragged=False
+            
+    def on_drop(self, event):
+        if self.dragged:
+            self.dragged=False
+            x,y = event.widget.winfo_pointerxy()
+            t = event.widget.winfo_containing(x,y)
+
+            if 'dayview' in str(t) and self.target: #schlechte Abfrage, funktioniert aber super xD
+                self.target.add(self.to_drop)                      
+
+class FoodLabel(Frame):
+    def __init__(self,master,food):
+        super().__init__(master,background=master['background'])
+        self._master=master
+        self._food = food
+
+        l1=Label(self, text=self._food.name, anchor='w', width=30)
+        l2=Label(self, text=self._food.category, anchor='w',width=20) #width Einstellung verbessern
+        l1.grid(column=0, row=0, padx=3,pady=1, sticky='wsen') #ToDo Einstellungen iwo global verwalten
+        l2.grid(column=1, row=0, padx=3,pady=1, sticky='wsen')
+        
 '''
 Stand Input_Window:
 - sieht eher mies aus
-- schlechtes Naming - eigentlich wird hier nur ausgewählt, nicht eingegeben (Drag, aber kein Drop)
-
-+ Suche funktioniert bereits gut, aktiviert durch Enter in der Suchleiste,
-    in der Food.db gefundene Datensätze werden inkl. Scrollbar angezeigt
+- schlechtes Naming - eigentlich wird hier nur ausgewählt
 
 Next steps:
 - Scrollbar über Mausrad aktivieren - binding
-- Namenslabel für foods begrenzen oder Feld in db (wenn in db, dann auch gleich tailing commas vernichten)
-* Drag n Drop von Suchfenser zu Tagesfenser (inkl. Mauszeiger)
-- Button-commands hinzufügen
 '''
         
 class Input_Window(Frame):
     def __init__(self, parent):
         super(Input_Window, self).__init__(parent)
         self.parent = parent
-        
+        self.drag_n_drop=DragAndDrop(self)
         self.active=False
         self.grid(row=0,column=0)
+        self.dragged_food=None
         
         self.category=''
 
@@ -74,6 +120,7 @@ class Input_Window(Frame):
         # Dayview
         self.day_frame = Dayview(self,Date.today())
         self.day_frame.grid(column=3, row=0, rowspan=3)
+        self.drag_n_drop.add_target(self.day_frame)
 
     def onMouseWheel(self,event):
         self.canvas.yview("scroll",event.delta,"units")
@@ -100,18 +147,16 @@ class Input_Window(Frame):
             if self.category:
                 if not self.category == found_food.category:
                     continue
-            name_label = Label(self.found_food_frame, text=found_food.name, anchor='w') 
-            category_label = Label(self.found_food_frame, text=found_food.category, anchor='w')
-            found_food_labels.append([name_label,category_label])
+            found_food_labels.append(FoodLabel(self.found_food_frame, found_food))           
         self.update_found_food_view(found_food_labels)
 
     def update_found_food_view(self,found_food_labels):
         self.del_old_found_foods()
-        for row,food in enumerate(found_food_labels):
-            for col,element in enumerate(food):
-                element.grid(row=row+1, column=col, padx=1,pady=1, sticky='wsen')
-                element.bind('<B1-Motion>',self.motion_active)
-                element.bind('<ButtonRelease-1>',self.motion_stopped)
+        for row,food_label in enumerate(found_food_labels):
+            food_label.grid(row=row+1, column=0, padx=1,pady=1, sticky='wsen')
+            self.drag_n_drop.add_dragable(food_label)
+            for element in food_label.grid_slaves():
+                self.drag_n_drop.add_dragable(element)
 
         if len(self.found_foods)>10: #10 nur als bsp... todo: besseren wert überlegen, vlt skalierbar
             self.canvas.update_idletasks()
@@ -130,3 +175,4 @@ if __name__ == '__main__':
     root = Tk()
     app = Input_Window(root)
     root.mainloop()
+    
