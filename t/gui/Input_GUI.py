@@ -4,6 +4,7 @@ from Search_code import FoodSearch as Search, Searchterm
 from Fonts import Fonts
 from datetime import date as Date, timedelta
 from clsDayview import Dayview
+from clsDay import Day
 
 class DragAndDrop():
     def __init__(self, parent):
@@ -95,7 +96,7 @@ class Input_Window(Frame):
         self.input_navigation_buttons=[]
         self.input_navigation_buttons.append(Button(self.input_navigation, text='Oft verwendete'))
         self.input_navigation_buttons.append(Button(self.input_navigation, text='Favouriten'))
-        self.input_navigation_buttons.append(Button(self.input_navigation, text='Gestern'))
+        self.input_navigation_buttons.append(Button(self.input_navigation, text='Gestern',command=self.yesterday))
         self.input_navigation_buttons.append(Button(self.input_navigation, text='Tag wählen'))
 
         self.input_navigation.grid(row=1,column=0, padx=Fonts.framedistance, pady=Fonts.framedistance,sticky='w')
@@ -125,7 +126,12 @@ class Input_Window(Frame):
     def onMouseWheel(self,event):
         self.canvas.yview("scroll",event.delta,"units")
         return
-    
+
+    def yesterday(self):
+        yesterday = Day(Date.today()-timedelta(days=1))
+        self.found_foods=yesterday.food_entries
+        self.create_new_found_food_labels()
+        
     def category_changed(self,event):
         self.category = self.category_box.get()
         self.create_new_found_food_labels()
