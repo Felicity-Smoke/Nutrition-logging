@@ -5,6 +5,8 @@ from Fonts import Fonts
 from datetime import date as Date, timedelta
 from clsDayview import Dayview
 from clsDay import Day
+from clsBasicCalendar import BasicCalendar
+import time
 
 class DragAndDrop():
     def __init__(self, parent):
@@ -97,7 +99,7 @@ class Input_Window(Frame):
         self.input_navigation_buttons.append(Button(self.input_navigation, text='Oft verwendete'))
         self.input_navigation_buttons.append(Button(self.input_navigation, text='Favouriten'))
         self.input_navigation_buttons.append(Button(self.input_navigation, text='Gestern',command=self.yesterday))
-        self.input_navigation_buttons.append(Button(self.input_navigation, text='Tag wählen'))
+        self.input_navigation_buttons.append(Button(self.input_navigation, text='Tag wählen',command=self.choose_day))
 
         self.input_navigation.grid(row=1,column=0, padx=Fonts.framedistance, pady=Fonts.framedistance,sticky='w')
         for col,input_navigation_button in enumerate(self.input_navigation_buttons):
@@ -130,6 +132,22 @@ class Input_Window(Frame):
     def yesterday(self):
         yesterday = Day(Date.today()-timedelta(days=1))
         self.found_foods=yesterday.food_entries
+        self.create_new_found_food_labels()
+
+    def choose_day(self):
+        print('iwie Kalender hier instanzieren und Datum zurück geben')
+        Calendar = BasicCalendar(self,mode=1)
+
+        #while not Calendar.get_clicked_day:
+         #   time.sleep(5)
+          #  print('in loop')
+        day = Calendar.get_clicked_day
+        if not day:
+            day=1
+            
+        date = Date(Calendar.month.year,Calendar.month.month,day)
+        day = Day(date)
+        self.found_foods=Day(date).food_entries
         self.create_new_found_food_labels()
         
     def category_changed(self,event):

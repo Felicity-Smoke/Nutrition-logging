@@ -29,11 +29,14 @@ class Logos():
         pass
         
 class CalendarDay(Frame):
-    def __init__(self,master=None, text='', fg='black', cnf={}, **kw):
+    def __init__(self,master=None, text='', fg='black', mode=0, cnf={}, **kw):
         Frame.__init__(self,master, cnf, **kw)
+        self.mode = mode
         self._day_text=text
         self.double_clicked=False
-
+        self.double_clicked_once=False
+        self.active_logos=[]
+        self.logolabels=[]
         self.active_color = 'whitesmoke'
         self.passive_color = 'lightgrey'
 
@@ -46,21 +49,20 @@ class CalendarDay(Frame):
             
         self.day_label=Label(self,text=self._day_text,background=self['background'],fg=fg,anchor='e')
         self.day_label.grid(column=0,row=0)
-        #self.day_label.bind('<Button-1>', self.clicked_day)
-        #self.day_label.bind('<Double-1>', self.double_clicked_day)
-        self.day_label.lower() #does not work!
+        self.day_label.bind('<Button-1>', self.clicked_day)
+        self.day_label.bind('<Double-1>', self.double_clicked_day)
 
-        self.active_logos=[]
-        self.logo_frame=Frame(self,background=self['background'])
-        self.logo_frame.grid(column=0,row=1)
+        if mode == 0:
+            print('Mode = 0 (Logos where shown)')
+            self.logo_frame=Frame(self,background=self['background'])
+            self.logo_frame.grid(column=0,row=1)
+      
+            for i in range(Logos.MAX_ACTIVE_LOGOS):
+                self.logolabels.append(Label(self.logo_frame, image='', width=1,height=1,background=self['background'],font=Fonts.mini))
 
-        self.logolabels=[]
-        for i in range(Logos.MAX_ACTIVE_LOGOS):
-            self.logolabels.append(Label(self.logo_frame, image='', width=1,height=1,background=self['background'],font=Fonts.mini))
-
-        for column,logolabel in enumerate(self.logolabels):
-            logolabel.grid(row=0,column=column,padx=1,pady=1,sticky='nswe')
-            
+            for column,logolabel in enumerate(self.logolabels):
+                logolabel.grid(row=0,column=column,padx=1,pady=1,sticky='nswe')
+                
     def on_enter(self, e):
         self.set_active()      
         for slave in self.grid_slaves():
@@ -72,19 +74,22 @@ class CalendarDay(Frame):
             slave.config(bg=self.passive_color)
         
     def clicked_day(self, event):
-            self.after(300, self.clicked, event)
+        self.after(300, self.clicked, event)
 
+    def double_clicked_day(self, event):
+        self.double_clicked=True
+        
     def clicked(self,event):
         if self.double_clicked:
             self.double_clicked=False
+            self.double_clicked_once=True
             print('Doppelklick auf ' + str(self.number) + ' (Todo: Fenster öffnen)')
+            self.clicked_day=self.number
+                
         else:
             self['background'] = self.active_color
             print(str(self.number) + ' wurde geklickt!')
             #self._eventlist.append(DayClickedEvent(self.number))  
-
-    def double_clicked_day(self, event):
-        self.double_clicked=True
 
     def set_active(self):
         self.config(bg=self.active_color)
@@ -100,6 +105,8 @@ class CalendarDay(Frame):
         self.day_label['foreground']=new_color
 
     def add_logo(self, logo):
+        if not self.mode == 0:
+            return False
         nr_of_logos=len(self.active_logos)
         if nr_of_logos<4 and not logo.name in self.active_logos:
             img=logo.image
@@ -110,6 +117,8 @@ class CalendarDay(Frame):
         return False
 
     def add_text(self, text):
+        if not self.mode == 0:
+            return False
         nr_of_logos=len(self.active_logos) #rename! vlt. nr_of_items
         if nr_of_logos<4 and not 'text' in self.active_logos:
             self.logolabels[nr_of_logos].configure(text=text)
@@ -118,6 +127,8 @@ class CalendarDay(Frame):
         return False
     
     def delete_logo(self, logo):
+        if not self.mode == 0:
+            return False
         for i,logoitem in enumerate(self.active_logos):
             if logoitem==logo.name:
                 img=''
@@ -126,19 +137,27 @@ class CalendarDay(Frame):
                 del self.active_logos[i]
 
     def delete_text(self):
+        if not self.mode == 0:
+            return False
         for i,logoitem in enumerate(self.active_logos):
             if logoitem=='text':
                 self.logolabels[i].configure(text='')
                 del self.active_logos[i]
                 
     def delete_all_logos(self): #rename .. items
+        if not mode == 0:
+            return False
         for label in self.logolabels:
             label.configure(text='')
             img=''
             label.configure(image=img)
             label.image=img
         self.active_logos=[]
-                              
+
+    @property
+    def was_double_clicked(self):
+        return self.double_clicked_once
+    
     @property
     def number(self):#sollte gelöscht werden, number ist komische bezeichnung!
         return self._day_text
