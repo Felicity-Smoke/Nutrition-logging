@@ -2,28 +2,30 @@ from clsFood import Food, Meal
 import re
 from datetime import date
 
+
 class FormerSearch(object):
     def __init__(self, search_term):
         self.date = date.today()
         self.search_term = search_term
-       
+
+
 class FoodSearch(object):
     def __init__(self, search_term, food_db):
         self.food_db = food_db
         
-        #Usereinstellungen - sollten später wo geändert werden können
+        # Usereinstellungen - sollten später wo geändert werden können
         max_hits_shown = 20
         self.vague_search = False
 
-        #Wird nichts gefunden Fuzzy-Methode anwenden
-        self.former_searches = [] #weiter oben definieren - sonst wird jedes Mal überschrieben
+        # Wird nichts gefunden Fuzzy-Methode anwenden
+        self.former_searches = []  # weiter oben definieren - sonst wird jedes Mal überschrieben
         self.former_searches.append(FormerSearch(search_term))
 
         self.hits = {}
         
         self.search_basic(search_term)
 
-        if self.vague_search and len(self.hits)<max_hits_shown:
+        if self.vague_search and len(self.hits) < max_hits_shown:
             self.search_vague(search_term)
 
     def search_basic(self, search_term):
@@ -54,9 +56,9 @@ class FoodSearch(object):
         return self.hits.values()
 
     def get_name_and_category(self):
-        name_and_category=[]
+        name_and_category = []
         for food in self.hits.values():
             el = {}
-            el['name']=food[0]+food[1]
-            el['category']=food[2]
+            el['name'] = food[0]+food[1]
+            el['category'] = food[2]
             name_and_category.append(el)

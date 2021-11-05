@@ -2,6 +2,7 @@ import sqlite3
 import re
 from datetime import date
 
+
 class Searchterm(object):
     def __init__(self, searchterm, vague_search=False, category=''):
         self.searchterm = searchterm
@@ -37,7 +38,8 @@ class Searchterm(object):
             if not re.findall(term, food_name, re.IGNORECASE):
                 return False
         return True
-       
+
+
 class FoodSearch(object):
     db_label_name = 'Name'
     db_food_table = 'Food'
@@ -46,9 +48,9 @@ class FoodSearch(object):
     db_connection = sqlite3.connect('Food.db')
     cursor = db_connection.cursor()
 
-    cursor.execute('SELECT Name FROM Food') #, format(name = db_label_name, table = db_label_name))
+    cursor.execute('SELECT Name FROM Food')  # format(name = db_label_name, table = db_label_name))
 
-    all_entries_by_name = [] #ToDo: als member, call o.Ä.
+    all_entries_by_name = []  # ToDo: als member, call o.Ä.
     for entry in cursor.fetchall():
         all_entries_by_name.append(entry[0])
         
@@ -65,13 +67,13 @@ class FoodSearch(object):
             cursor.execute('SELECT Name, Kategorie FROM Food WHERE Name=?', (found_food_name,))
             self.all_rows.append(cursor.fetchone())
 
-            #cursor.execute('SELECT {name}, {category} FROM {food} WHERE Name={searched} LIMIT {limit}'.\
-            #format(name = FoodSearch.db_label_name, category = FoodSearch.db_label_category, searched = found_food_name, food = FoodSearch.db_food_table, limit = max_hits_shown))
+            # cursor.execute('SELECT {name}, {category} FROM {food} WHERE Name={searched} LIMIT {limit}'.\
+            # format(name = FoodSearch.db_label_name, category = FoodSearch.db_label_category, searched = found_food_name, food = FoodSearch.db_food_table, limit = max_hits_shown))
                 
         FoodSearch.db_connection.close()
 
-        #Wird nichts gefunden Fuzzy-Methode anwenden
-        if searchterm_obj.is_search_vague_active == True and len(self.found_food_names)<30:
+        # Wird nichts gefunden Fuzzy-Methode anwenden
+        if searchterm_obj.is_search_vague_active is True and len(self.found_food_names) < 30:
             self.search_vague(searchterm_obj)
 
         for row in self.all_rows:
@@ -104,7 +106,7 @@ class FoodSearch(object):
     @property
     def get_foods(self):
         pass
-        #return self.hits.values()
+        # return self.hits.values()
 
     @property
     def get_name_and_category(self):
@@ -113,7 +115,5 @@ class FoodSearch(object):
 # _____MAIN_____
 
 # SUCHE
-#searchterm_obj = Searchterm('Apfel')
-#tempFood = FoodSearch(searchterm_obj)
-
-
+# searchterm_obj = Searchterm('Apfel')
+# tempFood = FoodSearch(searchterm_obj)
